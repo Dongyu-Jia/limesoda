@@ -7,7 +7,7 @@
 # If you have wget:
 # wget -qO- https://raw.githubusercontent.com/Dongyu-Jia/limesoda/main/get-started/new-machine-setup.sh | bash
 # for short:
-# curl -sL dub.sh/dj-setup | bash
+# curl -sL https://tinyurl.com/dj123-setup | bash
 # If you have neither:
 # sudo apt update && sudo apt install curl -y && curl -fsSL https://raw.githubusercontent.com/Dongyu-Jia/limesoda/main/get-started/new-machine-setup.sh | bash
 
