@@ -64,27 +64,9 @@ sudo apt-get install -y \
     traceroute \
     nmap \
     socat \
-    iperf3 \
-    pipx \
-    fzf \
-    zoxide \
-    fd-find \
     ripgrep \
     jq
 
-# Initialize zoxide in .bashrc
-if ! grep -q "zoxide init bash" ~/.bashrc; then
-    echo 'eval "$(zoxide init bash)"' >> ~/.bashrc
-fi
-
-# Alias fdfind to fd if fd doesn't exist
-if ! command -v fd &> /dev/null && command -v fdfind &> /dev/null; then
-    mkdir -p ~/.local/bin
-    ln -s $(which fdfind) ~/.local/bin/fd
-    if ! grep -q "PATH=\"\$HOME/.local/bin:\$PATH\"" ~/.bashrc; then
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-    fi
-fi
 
 # Install GitHub CLI if not already installed
 if ! command -v gh &> /dev/null; then
