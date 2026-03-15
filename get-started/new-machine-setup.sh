@@ -86,8 +86,6 @@ if ! command -v fd &> /dev/null && command -v fdfind &> /dev/null; then
     fi
 fi
 
-
-
 # Install GitHub CLI if not already installed
 if ! command -v gh &> /dev/null; then
     sudo apt-get install -y gh
