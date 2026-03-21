@@ -7,8 +7,8 @@
 
 ## Small Processes:
 1. `P3.1_PROTOTYPE_PARSING`: Parse the PRD to determine the required system interfaces (Visual UI, Developer API, or both).
-2. `P3.2_GENERATE_UX_PROTOTYPE`: If a visual UI is required, the UX Agent generates static HTML/Tailwind mockups to preview the user journey.
-3. `P3.3_GENERATE_DX_PROTOTYPE`: If a developer-facing API is required, the DX Agent generates the API user guide utilizing `doc/templates/DX_User_Guide_Template.md` to preview the developer experience (DX) via explicit JSON stubs and mock usage flows.
+2. `P3.2_GENERATE_UX_PROTOTYPE`: If a visual UI is required, the UX Agent generates static HTML/Tailwind mockups to preview the user journey. **This is executed as an individual sub-task for each Critical User Journey (CUJ) defined in the PRD.**
+3. `P3.3_GENERATE_DX_PROTOTYPE`: If a developer-facing API is required, the DX Agent generates the API user guide utilizing `doc/templates/DX_User_Guide_Template.md` to preview the developer experience (DX) via explicit JSON stubs and mock usage flows. **Each CUJ is treated as an individual sub-task here as well.**
 4. `P3.4_AGENT_PEER_REVIEW`: An independent QA or Architect Agent reviews the generated prototypes. It ensures that every CUJ defined in the PRD correctly maps to a visual screen or a DX usage example. If any CUJ is missing, or if the templates are not followed, it routes the process back to the generating Agents to fix before the human sees it.
 5. `P3.5_HUMAN_REVIEW`: Present the validated visual prototypes or API/User Guide docs to the human user for evaluation.
 6. `P3.6_REVISE_PROTOTYPE`: Iterative loop based on user design or ergonomic feedback.

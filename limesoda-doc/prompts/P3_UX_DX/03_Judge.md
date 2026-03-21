@@ -5,13 +5,19 @@
 **Objective:** Score the UX Document. Your grading curve must be pedantic. A score of 9 is pass, 8 is a hard FAIL. 
 
 **Scoring Rubric (0 to 10 points per category):**
-1. **Perspective: Frictionless Click-Count Validation**
+1. **Perspective: Design System Consistency (Template Group)**
+   - *10/10:* A clear "Template Group" exists that defines the design system (tokens, shared layout). No ad-hoc, inconsistent button styles across screens.
+   - *SCORE:* [Your Score]
+2. **Perspective: Atomic CUJ Separation**
+   - *10/10:* Each PRD journey is handled as a distinct, individually taskable block. No bleed-through or ambiguity between different user flows.
+   - *SCORE:* [Your Score]
+3. **Perspective: Frictionless Click-Count Validation**
    - *10/10:* The core user journey is completely frictionless. Routine actions require <= 2 steps. Cognitive load is incredibly low.
    - *SCORE:* [Your Score]
-2. **Perspective: Edge Case & Escape UI**
+4. **Perspective: Edge Case & Escape UI**
    - *10/10:* Every single screen accounts for empty states, loading indicators, and explicit "Cancel/Back" escape hatches. Users are never trapped.
    - *SCORE:* [Your Score]
-3. **Perspective: Frontend Viability**
+5. **Perspective: Frontend Viability**
    - *10/10:* Components clearly map to standard modern libraries (e.g., shadcn/ui, Radix) and are simple to implement structurally.
    - *SCORE:* [Your Score]
 

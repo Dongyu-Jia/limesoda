@@ -7,9 +7,11 @@ Error Handling: If you receive a REJECTED JSON from the Judge, you must explicit
 **Objective:** Generate a flawless `UX_DX_Schema.md`.
 
 **Instructions:**
-1. **Zero Magic Buttons:** For every screen defined in the PRD, list the exact components (Buttons, Modals, Forms) and exactly what backend API endpoint they call on click.
-2. **Loading & Error States:** Users don't just see success screens. You MUST define the UX for when the API takes 10 seconds (Skeleton loaders) or fails with a 500 block (Toast notifications).
-3. **Accessibility:** Enforce ARIA labels and focus states for all interactive elements.
+1. **The Initial Template Group:** Before designing specific screens, you MUST define the foundational "Template Group" (Design System). This includes the core typography, color-palette (HSL/Sleek Dark Mode), and global layout components (Sidebar, Breadcrumbs, UserDropdown) that will be reused across all views.
+2. **Atomic CUJ Individual Tasks:** Do not generate a single monolithic wireframe. For EVERY Critical User Journey defined in the Phase 2 PRD, you MUST create a self-contained "Task Block". Each Task Block must define the specific screens, transitions, and state changes for that journey in isolation.
+3. **Zero Magic Buttons:** For every screen, list the exact components and exactly what backend API endpoint they call on click.
+4. **Loading & Error States:** Users don't just see success screens. Define the UX for skeleton loaders and Toast-notification failure states.
+5. **Accessibility:** Enforce ARIA labels and focus states.
 
 **Output Constraints:**
 Output ONLY valid Markdown.

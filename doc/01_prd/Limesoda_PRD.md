@@ -33,7 +33,9 @@ Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaot
 * **User Flow:** 
     - Step 1: User creates a new project and authorizes the Limesoda GitHub App (or inputs a PAT). 
     - Step 2: User navigates to the "Infrastructure Bindings" tab, inputs 4 GCP Service Accounts (Dev, Test, Staging, Prod). System vaults these.
-    - Step 3: System initializes the `doc/` workspace in the target GitHub repo.
+    - Step 3: System initializes the `doc/` workspace in the target GitHub repo. 
+* **Failure Mode Handling (3.1.F1):** If the GitHub PAT lacks write scopes, the UI must surface a "Scope Insufficient" error with a direct link to the GitHub PAT generation page.
+* **Failure Mode Handling (3.1.F2):** If the GCP Key is invalid/expired, the "Vaulting" step must highlight the specific SA in red and block transition to Section 3.
 
 ### 3.2 CUJ: Organization Team Management
 * **User Goal:** Invite other engineers so the EM Agent knows exactly who to tag for escalations.
@@ -61,6 +63,7 @@ Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaot
     - Step 1: Human logs into the Web Dashboard and types their idea into the form: "Build a Stripe Checkout UI."
     - Step 2: The Control Plane backend receives the prompt and wakes up the EM Agent.
     - Step 3: The remainder of the software generation seamlessly transitions into GitHub Issues (See CUJ 3.8).
+* **Failure Mode Handling (3.4.F1):** If the genesis idea is fundamentally non-sensical or contains "safety violation" sequences, the UI must block the submission and highlight the conflicting text segment.
 
 ### 3.5 CUJ: Agent Observability (Runtime Radar)
 * **User Goal:** See exactly what the AI crew is doing without digging through CI logs.
@@ -111,12 +114,18 @@ Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaot
     - Step 3: Architect submits an updated LLD as a Pull Request. 
     - Step 4: For major changes, the EM assigns the PR to the Human Tech Lead for explicit Gate Approval.
     - Step 5: **Hard Limit:** After 3 redesign failures, the EM Agent halts the pipeline and escalates directly to the Human Tech Lead.
+* **Model Upgrade Mechanism:** The EM Agent performs an "Upgrade" by:
+    1. Swapping the active `LLM_MODEL_ID` from the "Default" (e.g., `gemini-2.0-flash`) to the "Reasoning" model (e.g., `gemini-2.0-pro`).
+    2. Setting `temperature` to `0.0`.
+    3. Injecting the full `remediation_plan` JSON from the Judge into the very first line of the new prompt buffer.
 
 ---
 
 ## 4. Non-Functional Requirements (NFRs)
 * **Scalability:** The Control Plane DB must support multi-tenancy (1 Organization -> N Projects -> N Repositories).
-* **Performance:** Agent state updates (WIP, Failed, Blocked) must reflect on the Dashboard UI via Websockets or fast polling (< 2 seconds latency).
+* **Performance:** 
+    - **Radar Latency:** Agent state updates (WIP, Failed, Blocked) must reflect on the Dashboard UI via Websockets with a **P99 latency of < 500ms**.
+    - **Prompt Generation:** The Control Plane must initiate an Agent node within **2 seconds** of a webhook/UI trigger.
 * **Data Persistence:** The system database (e.g., Postgres) tracks project metadata, user sessions, and vaulted secrets. The target GitHub repository remains the absolute source of truth for all SDLC artifacts (PRDs, LLDs, Code).
 * **Security Requirements:** All GCP/AWS service accounts must be encrypted at rest utilizing a KMS (Key Management Service).
 * **Error Handling & Resilience:**
@@ -128,6 +137,6 @@ Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaot
 ## 5. Acceptance Criteria & MVP Success Metrics
 
 ### 5.1 Success Metrics
-- A single user can concurrently orchestrate 2 separate Limesoda projects bound to 2 separate Github Repositories via the UI.
-- The UI accurately surfaces EM loop failures (e.g., 3/3 Developer test failures) natively in the dashboard without requiring the user to read raw CI logs.
-- If a human pushes a valid `Market_Feasibility_Report.md` to `doc/00_market_research/` via GitHub, the Limesoda UI instantly marks Phase 1 Complete and begins Phase 2 without being "prompted."
+- **Multi-Tenancy:** A single user can concurrently orchestrate 2 separate Limesoda projects bound to 2 separate Github Repositories via the UI.
+- **Error Visibility:** The UI accurately surfaces EM loop failures (e.g., 3/3 Developer test failures) natively in the dashboard within **5 seconds** of the final failure.
+- **Sync Integrity:** If a human pushes a valid `Market_Feasibility_Report.md` to `doc/00_market_research/` via GitHub, the Limesoda UI updates the Phase 1 state to `COMPLETE_HUMAN` and triggers Phase 2 webhook within **3 seconds**.
