@@ -31,70 +31,86 @@ Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaot
 * **Accessible By (Roles):** Organization Lead
 * **Screen Name / URL Path:** `/dashboard/projects/new`
 * **User Flow:** 
-    - Step 1: User creates a new project and authorizes the Limesoda GitHub App (or inputs a PAT) to bind a specific repository. 
-    - Step 2: User navigates to the "Infrastructure Bindings" tab.
-    - Step 3: User inputs 4 separate GCP Service Account JSONs (mapping to Dev, Test, Staging, and Prod environments). System securely vaults these.
-    - Step 4: System initializes the `doc/` workspace in the target GitHub repo.
+    - Step 1: User creates a new project and authorizes the Limesoda GitHub App (or inputs a PAT). 
+    - Step 2: User navigates to the "Infrastructure Bindings" tab, inputs 4 GCP Service Accounts (Dev, Test, Staging, Prod). System vaults these.
+    - Step 3: System initializes the `doc/` workspace in the target GitHub repo.
 
-### 3.2 CUJ: Triggering a New Feature (The Genesis Prompt)
+### 3.2 CUJ: Organization Team Management
+* **User Goal:** Invite other engineers so the EM Agent knows exactly who to tag for escalations.
+* **Accessible By (Roles):** Organization Lead
+* **Screen Name / URL Path:** `/dashboard/org/team`
+* **User Flow:** 
+    - Step 1: User opens Team Settings in the dashboard.
+    - Step 2: User adds an engineer by inputting their precise GitHub username (`@jane-doe`) and assigning them a Role (`Human Tech Lead`).
+    - Step 3: The system syncs this mapping into its database. The EM Agent will now dynamically assign GitHub Issues to these specific human users.
+
+### 3.3 CUJ: Project Protocol Configuration (Pipeline Customization)
+* **User Goal:** Disable specific pipeline phases for internal or low-risk projects.
+* **Accessible By (Roles):** Organization Lead, Human Tech Lead
+* **Screen Name / URL Path:** `/dashboard/projects/[id]/settings`
+* **User Flow:** 
+    - Step 1: User opens Project Settings and views the 10-Phase Pipeline toggle board.
+    - Step 2: User disables Phase 8 (SecOps Review) because the project is a low-risk internal scraper.
+    - Step 3: The EM Agent reads this configuration flag and autonomously skips Gate 8 during execution routing.
+
+### 3.4 CUJ: Triggering a New Feature (The Genesis Prompt)
 * **User Goal:** Generate Limesoda software safely by dropping an initial abstract idea.
 * **Accessible By (Roles):** Human Tech Lead
 * **Screen Name / URL Path:** `/dashboard/projects/[id]/new-feature`
 * **User Flow:** 
-    - Step 1: Human logs into the Limesoda Web Dashboard and types their idea into the New Feature form: "Build a Stripe Checkout UI."
+    - Step 1: Human logs into the Web Dashboard and types their idea into the form: "Build a Stripe Checkout UI."
     - Step 2: The Control Plane backend receives the prompt and wakes up the EM Agent.
-    - Step 3: The remainder of the software generation process seamlessly transitions out of the UI and into GitHub Issues for tracking (See CUJ 3.6).
+    - Step 3: The remainder of the software generation seamlessly transitions into GitHub Issues (See CUJ 3.8).
 
-### 3.3 CUJ: Agent Observability (Runtime Radar)
-* **User Goal:** See exactly what the AI crew is currently doing without digging through GitHub Action logs.
+### 3.5 CUJ: Agent Observability (Runtime Radar)
+* **User Goal:** See exactly what the AI crew is doing without digging through CI logs.
 * **Accessible By (Roles):** Human Tech Lead
 * **Screen Name / URL Path:** `/dashboard/projects/[id]/agents`
 * **User Flow:** 
-    - Step 1: User opens the Agent Radar.
-    - Step 2: The UI displays a live kanban/state-graph of the 10-Phase Pipeline. 
-    - Step 3: It highlights exactly which agent is active and specifically **which GitHub Issue** they are currently assigned to (e.g., "Developer Agent (A3) is `In Progress` on Issue #42: Build OAuth Wrapper. Step: `src/auth.js`. Retries: 1/3").
-    - Step 4: If an agent fails or encounters an architectural hallucination, the node turns red, and the EM Escalation log is exposed in a side-panel for human triage.
+    - Step 1: User opens the Agent Radar (live kanban of the 10-Phase Pipeline).
+    - Step 2: It highlights exactly which agent is active and **which GitHub Issue** they are assigned to (e.g., "Developer Agent (A3) is `In Progress` on Issue #42. Retries: 1/3").
+    - Step 3: If a node turns red, the EM Escalation log is exposed in a side-panel.
 
-### 3.4 CUJ: Manual Override Execution (GitHub Issue Reassignment)
-* **User Goal:** A human developer wants to immediately halt an AI agent and finish a task manually.
+### 3.6 CUJ: Pipeline Intervention (Pause & Resume)
+* **User Goal:** Low-friction, native ability to pause the AI to read code or manually fulfill a phase.
 * **Accessible By (Roles):** Human Tech Lead
-* **Screen Name / URL Path:** `GitHub Issues`
+* **Screen Name / URL Path:** `/dashboard/projects/[id]/pipeline`
 * **User Flow:** 
-    - Step 1: An AI Agent (e.g., Architect) is assigned to a GitHub Issue representing a current task. The Issue status is `In Progress`.
-    - Step 2: The Human decides the AI is struggling or they want to write the document themselves. The Human simply changes the Issue assignee from `@Limesoda-Architect` to themselves.
-    - Step 3: Limesoda webhooks detect the reassignment, instantly halt the running LangGraph agent node, and yield control.
-    - Step 4: The Human finishes the architecture PR, merges it, and closes the Issue. Limesoda detects the `Closed` status and autonomously wakes up the Phase 6 Agent for the next task.
+    - Step 1: The Human sees the AI is generating code for Issue #42 but wants to halt it momentarily.
+    - Step 2: The Human clicks the explicit "Pause Agent Execution" button on the Dashboard.
+    - Step 3: Limesoda halts the LangGraph node via a backend database flag. The AI completely stops commenting/pushing to GitHub.
+    - Step 4: The Human can optionally fulfill the task themselves (write the code/LLD in a PR), merge it, and click "Resume Execution" to wake the AI back up safely on the next step.
 
-### 3.5 CUJ: Active Human Notification & Routing
-* **User Goal:** The human is proactively alerted when the AI crew needs approval to proceed through a Gate.
+### 3.7 CUJ: Active Human Notification & Routing
+* **User Goal:** The human is proactively alerted when the AI needs approval.
 * **Accessible By (Roles):** Human Tech Lead
 * **Screen Name / URL Path:** `GitHub Pull Requests / Slack / Email`
 * **User Flow:** 
-    - Step 1: An AI agent finishes a critical contract (e.g., Phase 4 Architect generates `Architecture_RFC.md`).
-    - Step 2: Limesoda autonomously pushes the file to a branch and opens a GitHub Pull Request against `main`.
-    - Step 3: Limesoda utilizes the GitHub API to officially "Request Review" from the mapped Human Tech Lead, triggering native GitHub email/push notifications.
+    - Step 1: An AI agent finishes a critical contract (e.g., `Architecture_RFC.md`).
+    - Step 2: Limesoda opens a GitHub Pull Request against `main`.
+    - Step 3: Limesoda utilizes the GitHub API to officially "Request Review" from the mapped Human Tech Lead (from CUJ 3.2), triggering native notifications.
 
-### 3.6 CUJ: Universal Orchestration (The EM Issue Router)
-* **User Goal:** All async task management across the entire 10-Phase Pipeline is natively handled via GitHub Issues.
+### 3.8 CUJ: Universal Orchestration (The EM Issue Router)
+* **User Goal:** All async task management across the 10-Phase Pipeline is handled via GitHub Issues.
 * **Accessible By (Roles):** Agent: EM (A6), Human Tech Lead
 * **Screen Name / URL Path:** `GitHub Issues`
 * **User Flow:** 
-    - Step 1: Following the Genesis Prompt from the Web Dashboard (CUJ 3.2), the **EM Agent** (acting as the LangGraph brain) wakes up and connects to the target GitHub Repository.
-    - Step 2: The EM Agent generates the very first task as a GitHub Issue: *"Epic: Build a Stripe Checkout UI - Phase 1: Market Feasibility Analysis"*, and explicitly assigns it to `@Limesoda-PM`.
-    - Step 3: The **PM Agent** wakes up only because it was assigned the issue. It reads the issue description, performs web research, generates the report in a PR, and closes the task issue.
-    - Step 4: The **EM Agent** sees the closure, and generates the next procedural issue (*"Gate 1: Tech Lead Approval"*), assigning it to `@Human-TL`.
-    - Step 5: This exact pattern continues forever. The EM creates the Phase 4 task, assigns `@Limesoda-Architect`, waits for closure, then generates the Phase 5 Epic Backlog list. Every single agent action is tracked meticulously in the GitHub Issue timeline.
+    - Step 1: Following the Genesis Prompt (CUJ 3.4), the **EM Agent** wakes up and connects to GitHub.
+    - Step 2: The EM Agent generates the first task as a GitHub Issue: *"Epic: Build Stripe Checkout - Phase 1: Market Feasibility"*, assigning it to `@Limesoda-PM`.
+    - Step 3: The **PM Agent** wakes up strictly because it was assigned, researches, generates the report PR, and closes the issue.
+    - Step 4: The **EM Agent** sees the closure and generates the next procedural issue (*"Gate 1: Tech Lead Approval"*), assigning it to the specific Human TL mapped via CUJ 3.2.
+    - Step 5: Every agent action is tracked meticulously in the GitHub Issue timeline forever.
 
-### 3.7 CUJ: The Architectural Rollback (EM Remediation)
-* **User Goal:** Ensure the AI doesn't get trapped in an infinite coding loop due to a flawed architectural design.
+### 3.9 CUJ: The Architectural Rollback (EM Remediation)
+* **User Goal:** Ensure the AI doesn't get trapped in an infinite coding loop due to a flawed design.
 * **Accessible By (Roles):** Agent: EM (A6), Agent: Architect (A2), Human Tech Lead
 * **Screen Name / URL Path:** `GitHub Pull Requests`
 * **User Flow:** 
-    - Step 1: If the Developer Agent (A3) fails functional tests repeatedly, the **EM Agent** intervenes, halts A3, and upgrades the execution to a high-reasoner LLM (e.g., GPT-4o / Claude Opus) to retry the code generation.
-    - Step 2: If the upgraded model still fails, the EM Agent determines the underlying `Component_LLD` is logically impossible. The EM routes the task backward, waking up the **Architect Agent (A2)** to redesign the component.
-    - Step 3: The Architect Agent generates an updated LLD and submits it as a Pull Request. 
-    - Step 4: For minor LLD updates, the EM Agent autonomously approves and merges the PR. For major/breaking architecture changes, the EM assigns the PR to the Human Tech Lead for explicit Gate Approval.
-    - Step 5: **Hard Limit:** If the Architect redesigns the component 3 separate times and the Developer still cannot satisfy the functional tests, the EM Agent unconditionally halts the pipeline and escalates the issue directly to the Human Tech Lead for manual intervention.
+    - Step 1: If the Developer Agent fails functional tests repeatedly, the **EM Agent** intervenes, upgrading execution to a high-reasoner LLM (Claude Opus/GPT-4o) to retry.
+    - Step 2: If the upgraded model fails, the EM routes the task backward, waking the **Architect Agent (A2)** to redesign the component.
+    - Step 3: Architect submits an updated LLD as a Pull Request. 
+    - Step 4: For major changes, the EM assigns the PR to the Human Tech Lead for explicit Gate Approval.
+    - Step 5: **Hard Limit:** After 3 redesign failures, the EM Agent halts the pipeline and escalates directly to the Human Tech Lead.
 
 ---
 

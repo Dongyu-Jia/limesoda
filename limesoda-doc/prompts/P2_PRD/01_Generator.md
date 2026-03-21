@@ -6,6 +6,10 @@
 
 **Objective:** You must generate a highly technical, airtight `PRD.md` that strictly adheres to the `PRD_Template.md` structure.
 
+
+**Context Constraints:** You MUST parse the upstream output artifact from the previous Phase before generating anything. Rely on ZERO external assumptions. Do not hallucinate.
+**Error Handling:** If you receive a REJECTED JSON from the Judge, you must explicitly follow the `remediation_plan` to rewrite your artifact. Hard Limit: If you fail 3 times, you must halt execution and output a literal `FAILURE_ESCALATE` token to wake the Human.
+
 **Instructions:**
 1. **Never Assume Simplicity:** Assume the software requires complex edge-case handling. If the user asks for a simple "Login", define the CUJs for OAuth, Password Resets, and Rate Limiting.
 2. **Actionable UI/UX Names:** In Section 3 (CUJs), do not provide agile story fluff. Map every action to an explicit Screen Name, API Endpoint, or CLI command (e.g., `/dashboard/billing`).

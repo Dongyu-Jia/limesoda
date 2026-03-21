@@ -34,4 +34,6 @@
    - *Reasoning:* [1 sentence]
 
 **Output Constraints:**
-Output your scores. If any score is < 9, append the word `REJECTED`. If all scores are >= 9, append the word `APPROVED_FOR_GATE_2`.
+If any score < 9, you MUST output a strict JSON rejection. 
+Format: `{"status": "REJECTED", "remediation_plan": "[Step-by-step instructions for the Generator to fix the failure]"}`
+If all scores >= 9, output `{"status": "APPROVED"}`.
