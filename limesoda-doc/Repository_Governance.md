@@ -16,13 +16,14 @@ All projects built by Limesoda will autonomously adhere to the following strict 
 ├── doc/                    # The primary workspace for Agent-generated contracts.
 │   ├── 00_market_research/ # Stores Phase 1 Market Feasibility Reports.
 │   ├── 01_prd/             # Stores Phase 2 Product Requirements Documents (e.g., v1_MVP.md).
-│   ├── 02_ux_dx/           # Stores Phase 3 UX Prototypes and DX User Guides.
+│   ├── 02_ux_dx/           # Stores Phase 3A DX User Guides and API schemas.
 │   ├── 03_architecture/    # Stores Phase 4 Architecture RFCs, OpenAPI specs, and `schema.prisma`.
 │   ├── 04_components/      # Stores Phase 6 Component Low-Level Designs (LLDs).
 │   ├── 05_implementation/  # Stores Phase 7 Implementation Plans mapping LLDs to sprint goals.
 │   ├── 06_analytics/       # Stores Phase 10 Post-Mortem and Live Analytics evaluation reports.
 │   └── README.md
 │
+├── UX_prototype/           # Stores Phase 3B High-Fidelity Mock UIs and Design Systems.
 ├── .gitignore
 └── package.json            # (Or equivalent package manager)
 ```

@@ -6,7 +6,8 @@ Limesoda operates on a fixed, high-governance 10-Phase SDLC. Each phase is a "No
 | :--- | :--- | :--- | :--- |
 | **P1** | Market Research | PM Agent | `Market_Feasibility.md` |
 | **P2** | PRD | PM Agent | `PRD.md` |
-| **P3** | UX/DX | Designer | `Design_System_Templates` + `CUJ_Task_Blocks` |
+| **P3A** | Developer Exp (DX) | Designer | `DX_User_Guide.md` |
+| **P3B** | User Exp (UX) | Designer | `UX_prototype/` (Mock UI) |
 | **P4** | Architecture | Architect | `Architecture_RFC.md` |
 | **P5** | Milestone Planning | EM Agent | `Milestone_DAG.md` |
 | **P6** | Component Design | Architect | `Component_LLD.md` |

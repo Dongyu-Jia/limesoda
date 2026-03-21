@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limesoda | Organization</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .user-table th {
+            text-align: left;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .user-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .role-admin { background: rgba(0, 242, 255, 0.1); color: var(--primary); }
+        .role-lead { background: rgba(189, 255, 0, 0.1); color: var(--secondary); }
+        .role-viewer { background: rgba(255, 255, 255, 0.05); color: var(--text-dim); }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--surface-hover);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo" style="margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+            <div style="width: 30px; height: 30px; background: var(--secondary); border-radius: 6px;"></div>
+            <span style="font-weight: 900; font-size: 1.2rem; letter-spacing: -1px;">LIMESODA</span>
+        </div>
+
+        <div style="margin-bottom: 30px; padding: 12px; background: rgba(0, 242, 255, 0.05); border-radius: 8px; border: 1px solid rgba(0, 242, 255, 0.2); cursor: pointer;" onclick="location.href='projects.html'">
+            <div style="font-size: 0.7rem; color: var(--primary); text-transform: uppercase; font-weight: 800; display: flex; justify-content: space-between;">
+                Active Project <i class="fa-solid fa-chevron-right" style="font-size: 0.6rem;"></i>
+            </div>
+            <div style="font-weight: 600; font-size: 0.95rem; margin-top: 4px; color: #fff;">limesoda-engine</div>
+        </div>
+
+        <a href="index.html" class="nav-item"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a href="projects.html" class="nav-item"><i class="fa-solid fa-diagram-project"></i> Projects</a>
+        <a href="organization.html" class="nav-item active"><i class="fa-solid fa-users-gear"></i> Organization</a>
+        <a href="credentials.html" class="nav-item"><i class="fa-solid fa-key"></i> Credentials</a>
+    </div>
+
+    <main>
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h1>Team Management</h1>
+                <p class="subtitle">Defining the Human Loop for Limesoda Escalations.</p>
+            </div>
+            <button class="btn-primary"><i class="fa-solid fa-user-plus"></i> Invite Member</button>
+        </header>
+
+        <section class="glass-card">
+            <h3 style="margin-bottom: 25px;"><i class="fa-solid fa-id-badge" style="color: var(--primary);"></i> Active Members</h3>
+            
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>GitHub ID</th>
+                        <th>Role</th>
+                        <th>Last Activity</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="avatar">DJ</div>
+                                <span>Dongyu Jia</span>
+                            </div>
+                        </td>
+                        <td><code>@djia</code></td>
+                        <td><span class="role-badge role-admin">Admin</span></td>
+                        <td>Active Now</td>
+                        <td><i class="fa-solid fa-ellipsis-vertical" style="color: var(--text-dim);"></i></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="avatar" style="background: var(--primary); color: #000;">HT</div>
+                                <span>Human Tech Lead</span>
+                            </div>
+                        </td>
+                        <td><code>@lead-engineer</code></td>
+                        <td><span class="role-badge role-lead">Human Tech Lead</span></td>
+                        <td>2h ago</td>
+                        <td><i class="fa-solid fa-ellipsis-vertical" style="color: var(--text-dim);"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="glass-card" style="margin-top: 30px;">
+            <h4>RBAC Policy Rules</h4>
+            <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 10px;">
+                Agents will only tag the **Human Tech Lead** for Phase 7 code reviews and Phase 10 architectural redesign authorizations.
+            </p>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limesoda | Project Onboarding</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input[type="text"], input[type="password"], textarea {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #fff;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .stepper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            flex: 1;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+        }
+
+        .step.active {
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .repo-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--surface-hover);
+            border-radius: 12px;
+            border: 1px solid var(--primary);
+            margin-top: 10px;
+        }
+
+        .error-msg {
+            color: #ff0011;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo" style="margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+            <div style="width: 30px; height: 30px; background: var(--secondary); border-radius: 6px;"></div>
+            <span style="font-weight: 900; font-size: 1.2rem; letter-spacing: -1px;">LIMESODA</span>
+        </div>
+
+        <div style="margin-bottom: 30px; padding: 12px; background: rgba(0, 242, 255, 0.05); border-radius: 8px; border: 1px solid rgba(0, 242, 255, 0.2); cursor: pointer;" onclick="location.href='projects.html'">
+            <div style="font-size: 0.7rem; color: var(--primary); text-transform: uppercase; font-weight: 800; display: flex; justify-content: space-between;">
+                Active Project <i class="fa-solid fa-chevron-right" style="font-size: 0.6rem;"></i>
+            </div>
+            <div style="font-weight: 600; font-size: 0.95rem; margin-top: 4px; color: #fff;">limesoda-engine</div>
+        </div>
+
+        <a href="index.html" class="nav-item"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a href="projects.html" class="nav-item"><i class="fa-solid fa-diagram-project"></i> Projects</a>
+        <a href="organization.html" class="nav-item"><i class="fa-solid fa-users-gear"></i> Organization</a>
+        <a href="credentials.html" class="nav-item"><i class="fa-solid fa-key"></i> Credentials</a>
+    </div>
+
+    <main>
+        <header>
+            <h1>Onboard New Project</h1>
+            <p class="subtitle">Phase 3.2: Connecting the SDLC Brain to your Infrastructure.</p>
+        </header>
+
+        <div class="stepper">
+            <div class="step active"></div>
+            <div class="step active"></div>
+            <div class="step"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 400px; gap: 40px;">
+            <section class="glass-card">
+                <h3 style="margin-bottom: 25px;"><i class="fa-brands fa-github"></i> Repository Binding</h3>
+                
+                <div class="form-group">
+                    <label>Select Target Repository</label>
+                    <div class="repo-card">
+                        <i class="fa-brands fa-github" style="font-size: 1.5rem;"></i>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600;">djia/limesoda-engine</div>
+                            <div style="font-size: 0.75rem; color: var(--text-dim);">Main Branch | Last Sync: 2m ago</div>
+                        </div>
+                        <i class="fa-solid fa-circle-check" style="color: var(--secondary);"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>GitHub Personal Access Token (PAT)</label>
+                    <input type="password" value="••••••••••••••••••••••••">
+                    <div class="error-msg">
+                        <i class="fa-solid fa-triangle-exclamation"></i> 
+                        Scope Insufficient: "Write" access to Issues & PRs required. <a href="#" style="color: #ff0011;">Update Scopes</a>
+                    </div>
+                </div>
+
+                <h3 style="margin: 40px 0 25px;"><i class="fa-solid fa-cloud" style="color: var(--primary);"></i> GCP Infrastructure Binding</h3>
+                
+                <div class="form-group">
+                    <label>Staging Service Account Key (JSON)</label>
+                    <textarea rows="4" placeholder="Paste GCP Service Account JSON here..."></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 30px;">
+                    <button class="btn-primary">Initialize Doc Workspace</button>
+                </div>
+            </section>
+
+            <aside>
+                <div class="glass-card" style="background: rgba(0, 242, 255, 0.05);">
+                    <h4 style="color: var(--primary); margin-bottom: 15px;"><i class="fa-solid fa-shield-halved"></i> Security Protocol</h4>
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: var(--text-dim);">
+                        Limesoda utilizes **AES-256-GCM** encryption for all vaulted credentials. Keys are injected at runtime into ephemeral agent execution nodes and wiped immediately after the Phase Gate closes.
+                    </p>
+                    <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--border-color);">
+                    <ul style="font-size: 0.8rem; list-style: none; display: flex; flex-direction: column; gap: 10px;">
+                        <li><i class="fa-solid fa-check" style="color: var(--secondary);"></i> KMS Rotation enabled</li>
+                        <li><i class="fa-solid fa-check" style="color: var(--secondary);"></i> RBAC Isolation active</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </main>
+</body>
+</html>
