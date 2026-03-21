@@ -8,8 +8,14 @@ The **Agent Radar** screen provides a real-time visualization of the SDLC Graph.
 - **Pulsing Blue Node:** The active Phase (e.g., Phase 4 Architecture is generating an RFC).
 - **Red Node:** An EM Escalation has occurred (e.g., 3 consecutive Judge rejections).
 
+### Drill-Down Monitoring
+Clicking on any active or completed **Node** in the Radar opens the **Issue Explorer**:
+1. **Issue Status:** View each granular issue (Todo, In-Progress, Done) within that Phase.
+2. **Agent Assignment:** See exactly which **Agent ID** (e.g., `D-42` for Developer) is assigned to each issue.
+3. **Live Logs:** Stream the terminal output and internal reasoning for any active agent.
+
 > [!TIP]
-> The Agent Radar is high-performance. Node state changes (Active -> Done) are synchronized via Websockets with a **P99 latency of < 500ms**, ensuring you are always seeing the most current state of the AI crew.
+> The Agent Radar is high-performance. Node and Issue state changes are synchronized via Websockets with a **P99 latency of < 500ms**, ensuring you are always seeing the most current state of the AI crew.
 
 ## 2. Pausing the Pipeline
 If you want to stop the AI at any time to refactor code manually:
