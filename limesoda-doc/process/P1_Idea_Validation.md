@@ -2,7 +2,7 @@
 - **Unique ID**: `P1_IDEA_VALIDATION`
 - **Goal**: Evaluate the user's idea against market realities and provide a Go/No-Go recommendation. Determine if it is a new project or a feature.
 - **Input**: Natural language user prompt or generic idea.
-- **Output**: A Market Feasibility Report with a Go/No-Go verdict, and a Routing classification (New Project vs Incremental Feature).
+- **Output**: A Market Feasibility Report with a Go/No-Go verdict, and a Routing classification (New Project vs Incremental Feature). **This artifact MUST be saved to `doc/00_market_research/[Feature_Name]_Market_Feasibility_Report.md`.**
 - **Criteria**: Human User reviews the report and explicitly approves moving forward to PRD generation (Gate 1).
 ## Small Processes:
 1. `P1.1_ROUTING_CLASSIFICATION`: Determine if the input is a brand new product or an incremental feature for an existing project.

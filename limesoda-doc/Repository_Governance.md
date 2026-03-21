@@ -13,7 +13,8 @@ All projects built by Limesoda will autonomously adhere to the following strict 
 ├── src/                    # (Written by Business Logic Developers) Core application code.
 ├── tests/                  # (Written by Business Logic Developers) Functional and Unit tests.
 │
-├── docs/                   # The primary workspace for Agent-generated contracts.
+├── doc/                    # The primary workspace for Agent-generated contracts.
+│   ├── 00_market_research/ # Stores Phase 1 Market Feasibility Reports.
 │   ├── 01_prd/             # Stores Phase 2 Product Requirements Documents (e.g., v1_MVP.md).
 │   ├── 02_ux_dx/           # Stores Phase 3 UX Prototypes and DX User Guides.
 │   ├── 03_architecture/    # Stores Phase 4 Architecture RFCs, OpenAPI specs, and `schema.prisma`.
@@ -28,8 +29,8 @@ All projects built by Limesoda will autonomously adhere to the following strict 
 
 ## Governance Rules
 
-### 1. The `docs/` Rule of Law
-No Business Logic Developer may write executable code in `src/` unless there is a corresponding, merged Component LLD residing in `docs/04_components/` that clearly defines the exact Success Criteria for that code. The `docs/` folder is not an afterthought; it is the mathematical contract the AI executes against.
+### 1. The `doc/` Rule of Law
+No Business Logic Developer may write executable code in `src/` unless there is a corresponding, merged Component LLD residing in `doc/04_components/` that clearly defines the exact Success Criteria for that code. The `doc/` folder is not an afterthought; it is the mathematical contract the AI executes against.
 
 ### 2. PR Triage and Review
 When an AI Agent generates a document (like an Architecture RFC), it will submit a Pull Request. 
