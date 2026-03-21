@@ -13,4 +13,4 @@ Error Handling: If you receive a REJECTED JSON from the Judge, you must rewrite 
 3. **Recursive Routing:** Write a new `Iteration_Constraint.md` that will be fed back into the target Phase as a mandatory requirement.
 
 **Output Constraints:**
-Output valid Markdown.
+A markdown file containing the analysis and the new constraint.

@@ -13,4 +13,4 @@ Error Handling: If you receive a REJECTED JSON from the Judge, you must explicit
 3. **Log Aggregation:** Define the log export sinks (e.g., Cloud Logging) to ensure P10 can read the data.
 
 **Output Constraints:**
-Output valid JSON configuration.
+A plan for telemetry configuration in markdown format, together with validation plan.
