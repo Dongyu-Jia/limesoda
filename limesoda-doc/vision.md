@@ -131,6 +131,16 @@ In `Limesoda`, the AI performs the exhaustively complex, high-friction labor of 
 
 ---
 
+## Dogfooding: Building Limesoda with Limesoda
+
+There is no better test of a software factory than forcing it to build itself.
+
+The Limesoda project fundamentally believes in "eating our own dogfood." We strictly adhere to processes  mapped in our own documentation to develop the capabilities of the Limesoda project. 
+
+When we expand an agent's capability, we draft a PRD. We mandate a Architecture RFC. We force the code through the Multi-Agent Peer Review gauntlet. If the pipeline is not rigorous enough to reliably build the Limesoda ecosystem, it is not rigorous enough to build yours.
+
+---
+
 ## The Goal
 
 The ultimate goal of software is not to exist; it is to create value. Generating 1,000 AI-built applications that lack actual user engagement and retention is completely useless. Therefore, the goal of Limesoda is twofold: to drastically improve the likelihood of achieving Product-Market Fit (PMF), and to radically reduce the tedious "human-in-the-loop" execution time required to find it.
