@@ -122,13 +122,5 @@ bind '"\e[B": history-search-forward'
 EOF
 fi
 
-# --- 启用 PVE xterm.js 串口控制台支持 ---
-echo "Enabling Serial Console for PVE xterm.js..."
-# 修改 GRUB 配置，让内核输出重定向到 ttyS0
-sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="console=tty0 console=ttyS0,115200 /' /etc/default/grub
-
-# 更新 GRUB 并在 PVE 侧生效
-sudo update-grub
-
 # 登录 Tailscale
 sudo tailscale up
