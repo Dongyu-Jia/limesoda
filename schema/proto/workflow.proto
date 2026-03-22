@@ -73,10 +73,9 @@ message Process {
   string id = 1;                     // Unique identifier (UUID)
   string name = 2;                   // Human-readable name of the process
   string entry_node_id = 3;          // Entry node ID
-  string exit_node_id = 4;           // Exit node ID
-  repeated Node nodes = 5;           // Set of nodes in the process
-  repeated Edge edges = 6;           // Set of transitions between nodes
-  repeated OverrideRule rules = 7;   // Execution rules (e.g. run limits)
+  repeated Node nodes = 4;           // Set of nodes in the process
+  repeated Edge edges = 5;           // Set of transitions between nodes
+  repeated OverrideRule rules = 6;   // Execution rules (e.g. run limits)
 }
 
 // WorkflowStatus tracks the overall lifecycle of a Workflow execution.
