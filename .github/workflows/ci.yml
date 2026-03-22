@@ -97,7 +97,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy:
+  deploy-prototype:
     runs-on: ubuntu-latest
     needs: [lint, test-api, test-web]
     if: github.ref == 'refs/heads/main'

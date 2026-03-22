@@ -9,7 +9,7 @@
   - [Milestone Plan](doc/04_milestone_plan/Milestone_Plan.md)
   - [Issue Backlog](doc/05_issue_backlog/Milestone_1_2_Tickets.md)
   - [Open Source Strategy](doc/Open_Source_Strategy.md)
-  - [**Interactive Prototype**](/prototype/)
+  - [**Interactive Prototype**](prototype/ :ignore)
 
 - **Limesoda Internal**
   - [Vision](limesoda-doc/vision.md)
