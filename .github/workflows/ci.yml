@@ -96,3 +96,38 @@ jobs:
             --label "core"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [lint, test-api, test-web]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          
+      - name: Install & Build Prototype
+        run: |
+          cd UX_prototype
+          npm install
+          npm run build
+          
+      - name: Prepare Deployment Directory
+        run: |
+          mkdir -p public
+          # Copy root files (Docsify)
+          cp index.html _sidebar.md README.md .nojekyll public/
+          cp -r doc limesoda-doc public/
+          # Copy built prototype
+          mv UX_prototype/dist public/prototype
+          
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
