@@ -12,8 +12,8 @@
 Limesoda is a multi-tenant Enterprise AI Orchestration SaaS. Its Control Plane manages a 10-phase SDLC pipeline where LLM agents execute software development tasks inside isolated sandboxes, with human gates at critical checkpoints.
 
 **Authoritative Schemas:**
-*   **API Contract**: [control_plane.proto](file:///Users/dongyujia/Documents/GitHub/limesoda/schema/proto/control_plane.proto)
-*   **Database Schema**: [schema.prisma](file:///Users/dongyujia/Documents/GitHub/limesoda/schema/prisma/schema.prisma)
+*   **API Contract**: [control_plane.proto](schema/proto/control_plane.proto)
+*   **Database Schema**: [schema.prisma](schema/prisma/schema.prisma)
 
 This RFC defines two tiers: **Community** (open source, self-hosted) and **Cloud** (managed SaaS). Community is a strict subset — Cloud adds operational services on top without forking the codebase.
 
