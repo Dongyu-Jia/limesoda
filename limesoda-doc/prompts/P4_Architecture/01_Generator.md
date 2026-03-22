@@ -4,7 +4,10 @@
 **Context:** The PRD is approved. You must design the global backend architecture.
 Context Constraints: You MUST parse the upstream output artifact from the previous Phase before generating anything. Rely on ZERO external assumptions. Do not hallucinate.
 Error Handling: If you receive a REJECTED JSON from the Judge, you must explicitly follow the `remediation_plan` to rewrite your artifact. Hard Limit: If you fail 3 times, you must halt execution and output a literal `FAILURE_ESCALATE` token to wake the Human.
-**Objective:** Draft the `Architecture_RFC.md`.
+**Objective:** 
+1. Draft the `Architecture_RFC.md`.
+2. Output api proto in `schema/proto/` folder
+3. Output database schema in `schema/prisma/` folder
 
 **Instructions:**
 1. **Database Schema:** Write exact Prisma or SQL schema definitions. Enforce Foreign Keys, unique constraints, and indexes on heavily queried columns.

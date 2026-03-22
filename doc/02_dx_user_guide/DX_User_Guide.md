@@ -1,33 +1,6 @@
-# DX User Guide: Limesoda Control Plane (React Prototype)
+# DX User Guide: Limesoda Control Plane
 
 This document defines the interface contract and design system for the High-Fidelity UX Prototype.
-
-## 🎨 Design System (The "Light Refresh")
-
-| Asset | Specification |
-| :--- | :--- |
-| **Typography** | `Outfit` (Headings), `Inter` (UI/Body) |
-| **Primary Color** | `Lime Green` - HSL(74, 100%, 50%) |
-| **Surface** | Glassmorphism (`backdrop-filter: blur(12px)`) |
-| **Core Accent** | Neon Pulse (`intense-glow` animation) |
-
-## 🌍 Global State: `ProjectContext`
-The prototype uses a top-level React Context to ensure that "Working On: {Project}" is synchronized across all screens.
-
-### Context Hook
-```javascript
-const { activeProject, setActiveProject, projects } = useProject();
-```
-
-## 🏗️ Component Registry
-
-### 1. `Sidebar`
-- **Logic**: Switches between `Organization Scope` (dark theme) and `Working On` (neon theme) based on the current route.
-- **Project Selector**: A dropdown within the pulsating bubble allows global project switching.
-
-### 2. `Layout`
-- **Structure**: Fixed left sidebar, scrollable main content, and a fixed system status footer.
-- **Glassmorphism**: Applied to all `.glass-card` elements for a premium feel.
 
 ## 🛤️ Critical User Journeys (CUJs)
 

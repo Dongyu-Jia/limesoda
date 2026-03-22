@@ -1,0 +1,55 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Organization {
+  id          String    @id @default(uuid())
+  name        String
+  githubAppId String
+  createdAt   DateTime  @default(now())
+  projects    Project[]
+}
+
+model Project {
+  id              String        @id @default(uuid())
+  orgId           String
+  name            String
+  githubRepoUrl   String
+  githubRepoOwner String
+  githubRepoName  String
+  enabledPhases   Int[]
+  createdAt       DateTime      @default(now())
+  organization    Organization  @relation(fields: [orgId], references: [id])
+  teamMembers     TeamMember[]
+  secrets         Secret[]
+}
+
+model TeamMember {
+  id             String   @id @default(uuid())
+  projectId      String
+  githubUsername String
+  role           Role
+  createdAt      DateTime @default(now())
+  project        Project  @relation(fields: [projectId], references: [id])
+}
+
+model Secret {
+  id           String   @id @default(uuid())
+  projectId    String
+  key          String
+  gcpSecretId  String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  project      Project  @relation(fields: [projectId], references: [id])
+}
+
+enum Role {
+  HUMAN_TECH_LEAD
+  ORG_LEAD
+  SYSTEM_ADMIN
+}

@@ -18,6 +18,14 @@
 
 ---
 
+### 1.2 Design Critique & Alternative Analysis (Anti-Patterns)
+**Instructions for Architect Agent:** This section is mandatory. You must explicitly critique your own design above. Look for:
+1. **Distributed Consistency (Dual-Write)**: Are you updating two systems (e.g., SQL + Temporal) in the same transaction? If so, what happens if one fails?
+2. **Persistence Anti-Patterns**: Are you using a relational DB for high-volume logs or time-series data?
+3. **Maintenance Overhead**: Can the "Community" and "Cloud" tiers be unified while still allowing for cloud-native optimizations (e.g., Log Sinks vs. SQL Audit)?
+
+---
+
 ## 2. High-Level Architecture Diagram
 Provide a Mermaid.js diagram illustrating the high-level flow of the system, including the client application, API layers, database, background workers, and any crucial external third-party services (e.g., Stripe, AWS S3).
 
@@ -33,22 +41,9 @@ graph TD
 ---
 
 ## 3. Core Data Models / Database Schema
-Provide the exact, syntactically valid schema definitions required to store the application data securely.
+Provide the exact technical specifications required to store and protect application data. **Must include an ERD (Entity Relationship Diagram) or database chart illustrating the primary tables and their relations.**
 
-### 3.1 Schema Definition
-Provide the schema below (e.g., `schema.prisma`, `SQL DDL`, or Mongoose Schema).
-
-```prisma
-// Example Prisma Block
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  role      String   @default("USER") // Ties to PRD RBAC
-  createdAt DateTime @default(now())
-}
-```
-
-### 3.2 Security & Data Privacy Constraints
+### 3.1 Security & Data Privacy Constraints
 * **PII Handling:** Which columns contain Personally Identifiable Information? Are they encrypted at rest?
 * **Row-Level Security / DB Auth:** How enforces the RBAC matrix defined in the PRD at the database level?
 
@@ -109,5 +104,6 @@ Provide a prioritized checklist of the individual Low-Level Designs (LLDs) that 
 
 ### Checklist
 - [ ] **[Component 1 Name]**: Description of what this component is and why it needs its own specific Low-Level Design doc.
+- [ ] **Database Chart & Migration Plan**: Comprehensive ERD (Entity Relationship Diagram), indexing strategy for high-density lookups, and initial SQL DDL scripts.
 - [ ] **[Component 2 Name]**: Description...
 - [ ] **[Component 3 Name]**: Description...

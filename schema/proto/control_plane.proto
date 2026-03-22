@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package limesoda.control_plane.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// The ControlPlane service manages the lifecycle of AI orchestration tasks,
+// project configurations, and system health.
+service ControlPlane {
+  // Trigger a new feature generation workflow.
+  rpc Genesis(GenesisRequest) returns (Task);
+
+  // Retrieve the task registry for a specific project.
+  rpc GetProjectTasks(GetProjectTasksRequest) returns (TaskList);
+
+  // Manually override or fulfill a specific task phase.
+  rpc OverrideTask(OverrideTaskRequest) returns (Task);
+
+  // Unified health check for all system components.
+  rpc GetHealth(GetHealthRequest) returns (HealthResponse);
+}
+
+// --- Resources ---
+
+message Task {
+  string id = 1;                     // UUID
+  int32 phase = 2;                   // 1-indexed SDLC phase
+  TaskStatus status = 3;
+  string genesis_prompt = 4;
+  int32 github_issue_number = 5;
+  int32 retry_count = 6;
+  Heartbeat last_heartbeat = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+enum TaskStatus {
+  TASK_STATUS_UNSPECIFIED = 0;
+  TASK_STATUS_PENDING = 1;
+  TASK_STATUS_WORKING = 2;
+  TASK_STATUS_DONE = 3;
+  TASK_STATUS_FAILED = 4;
+  TASK_STATUS_ESCALATED = 5;
+  TASK_STATUS_PAUSED = 6;
+}
+
+message Heartbeat {
+  string last_log = 1;
+  int32 log_count = 2;
+}
+
+// --- Request/Response Messages ---
+
+message GenesisRequest {
+  string project_id = 1;             // UUID
+  string prompt = 2;
+  optional int32 start_phase = 3;    // If null, AI decides
+}
+
+message GetProjectTasksRequest {
+  string project_id = 1;             // UUID
+  optional TaskStatus status = 2;
+  optional int32 phase = 3;
+}
+
+message TaskList {
+  repeated Task tasks = 1;
+  int32 total = 2;
+}
+
+message OverrideTaskRequest {
+  string task_id = 1;                // UUID
+  OverrideAction action = 2;
+  string note = 3;
+}
+
+enum OverrideAction {
+  OVERRIDE_ACTION_UNSPECIFIED = 0;
+  OVERRIDE_ACTION_FULFILL = 1;
+  OVERRIDE_ACTION_REJECT = 2;
+  OVERRIDE_ACTION_PAUSE = 3;
+}
+
+message GetHealthRequest {}
+
+message HealthResponse {
+  ComponentStatus temporal = 1;
+  ComponentStatus e2b = 2;
+  ComponentStatus database = 3;
+  ComponentStatus github = 4;
+}
+
+message ComponentStatus {
+  string status = 1;                 // "healthy", "degraded", "down"
+  map<string, string> metrics = 2;   // e.g. "active_sandboxes": "3"
+}
