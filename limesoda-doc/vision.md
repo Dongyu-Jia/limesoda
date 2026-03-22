@@ -25,43 +25,13 @@ When AI coding fails, it is usually because it attempted to jump straight from a
 
 ## The Dual Ladders of Decompression
 
-To successfully navigate from an abstract idea to a retained user, the system must walk down the Generative Ladder and climb back up the Validation Ladder. 
+To successfully navigate from an abstract idea to a retained user, the system must walk down the **Generative Ladder** and climb back up the **Validation Ladder**.
 
-### The Generative Descent (Macro $\rightarrow$ Micro)
-Here, compressed AI intelligence translates massive, ambiguous human intent into hyper-specific, granular code.
-```text
-[ Idea / Market Need ]     — What is the macro value?
-         |
-         v
-[ Product Requirements ]   — What are the exact user journeys?
-         |
-         v
-[ High-Level Architecture] — How do the systems securely connect?
-         |
-         v
-[ Component Low-Level ]    — What are the exact files and success criteria?
-         |
-         v
-[ Source Code ]            — The exact micro-level implementation.
-```
+![The Dual Ladders of Decompression](assets/vision/dual-ladders.jpg)
 
-### The Validation Ascent (Micro $\rightarrow$ Macro)
-Once the code exists, the system must climb back up, using specific signals at each layer to prove the micro-code actually achieves the macro-value.
-```text
-[ Unit & Functional Tests ] — Does the code functionally hit the component criteria?
-         |
-         v
-[ Integration & E2E Tests ] — Does the system cohere visually and technically end-to-end?
-         |
-         v
-[ Human UAT & Judgment ]    — Does the product actually feel right to a human?
-         |
-         v
-[ Click-Through Rate ]      — Do real users engage with it in the market?
-         |
-         v
-[ Retention Rate ]          — Does it sustain real value over time? (The Ultimate Macro Value)
-```
+### The Decompression Journey
+- **Generative Descent (Macro $\rightarrow$ Micro):** Translating abstract human intent into hyper-specific, granular code.
+- **Validation Ascent (Micro $\rightarrow$ Macro):** Proving that the micro-code actually achieves the macro-value using specific signals at each layer.
 
 Each layer decompresses at a different **resolution** and **latency**:
 
