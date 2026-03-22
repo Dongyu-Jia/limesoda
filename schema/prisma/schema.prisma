@@ -7,6 +7,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator py {
+  provider = "prisma-client-py"
+}
+
 model Organization {
   id          String    @id @default(uuid())
   name        String
