@@ -72,6 +72,9 @@ jobs:
     runs-on: ubuntu-latest
     if: failure()
     needs: [lint, test-api, test-web]
+    permissions:
+      issues: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       
