@@ -11,6 +11,7 @@ Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaot
 ### 1.2 Feasibility & Constraints 
 - **Technical Capabilities Required:** A Next.js/React Web Dashboard interfacing with a backend LLM orchestration framework (LangGraph).
 - **Security / Compliance:** The system must securely vault high-level GCP Service Account keys and GitHub Personal Access Tokens (PATs) for multiple tenants.
+- **Observability Gap:** High-level pipeline states (Task Management) are decoupled from lower-level infrastructure health (Cluster Health).
 - **Budget / Token Constraints:** Restrict expensive model usage to EM Escalation. Use cheaper models for background state updates for the UI.
 
 ---
@@ -65,14 +66,23 @@ Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaot
     - Step 3: The remainder of the software generation seamlessly transitions into GitHub Issues (See CUJ 3.8).
 * **Failure Mode Handling (3.4.F1):** If the genesis idea is fundamentally non-sensical or contains "safety violation" sequences, the UI must block the submission and highlight the conflicting text segment.
 
-### 3.5 CUJ: Agent Observability (Runtime Radar)
+### 3.5 CUJ: Task Management (The Agent Registry)
 * **User Goal:** See exactly what the AI crew is doing without digging through CI logs.
 * **Accessible By (Roles):** Human Tech Lead
-* **Screen Name / URL Path:** `/dashboard/projects/[id]/agents`
+* **Screen Name / URL Path:** `/dashboard/projects/[id]/tasks`
 * **User Flow:** 
-    - Step 1: User opens the Agent Radar (live kanban of the 10-Phase Pipeline).
-    - Step 2: It highlights exactly which agent is active and **which GitHub Issue** they are assigned to (e.g., "Developer Agent (A3) is `In Progress` on Issue #42. Retries: 1/3").
-    - Step 3: If a node turns red, the EM Escalation log is exposed in a side-panel.
+    - Step 1: User opens Task Management (live registry of the 10-Phase Pipeline).
+    - Step 2: It highlights exactly which agent is active on **specific GitHub Issues** (e.g., "Developer Agent (A3) is `In Progress` on Issue #42").
+    - Step 3: Users can inspect individual issue buffers (prompts, models) and perform granular halts/overrides.
+    - Step 4: Access "EM Escalation Logs" via a side-panel for failed nodes.
+
+### 3.10 CUJ: Cluster-wide Health & Observability
+* **User Goal:** Monitor the underlying infrastructure and orchestration engine status.
+* **Accessible By (Roles):** System Admin, Organization Lead
+* **Screen Name / URL Path:** `/dashboard/health`
+* **User Flow:**
+    - Step 1: User opens Cluster Health from the global navigation.
+    - Step 2: System displays Node counts, Orchestration Latency, and Global Agent Backlog across all projects.
 
 ### 3.6 CUJ: Pipeline Intervention (Pause & Resume)
 * **User Goal:** Low-friction, native ability to pause the AI to read code or manually fulfill a phase.

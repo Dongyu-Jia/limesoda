@@ -11,10 +11,10 @@ Welcome to the Limesoda Control Plane. Limesoda is not just a code generator; it
 3. **[The 10-Phase Pipeline Graph](03_Pipeline.md)**
    - Understanding the Automated Gates
    - Reviewer Personas (Sanity vs. Value)
-4. **[Human-in-the-Loop: Monitoring & Overrides](04_Monitoring.md)**
-   - The Agent Radar Dashboard
-   - Pausing and Manually Fulfilling Stages
-   - Managing EM Escalations
+4. **[Human-in-the-Loop: Task Management](04_Monitoring.md)**
+   - The Agent Task Registry
+   - Granular Prompt Inspection
+   - Manual Overrides and Halting
 5. **[Production & Feedback Loops](05_Production.md)**
    - Deployment (Phase 8)
    - Real-time Observability (Phase 9)
@@ -25,9 +25,12 @@ Welcome to the Limesoda Control Plane. Limesoda is not just a code generator; it
 7. **[Troubleshooting & Recovery Playbooks](07_Troubleshooting.md)**
    - Common onboarding failures (PAT scopes, invalid cloud keys)
    - Stuck phases, repeated judge rejections, and hard limits
-8. **[Security, Privacy, and Auditability](08_Security_Privacy.md)**
-   - Secret vaulting, redaction, and access control
-   - Log visibility and retention expectations
+9. **[Infrastructure: Cluster Health](09_ClusterHealth.md)**
+   - Real-time Node Monitoring
+   - System Integrity Checks
+10. **[Governance: Agent Management](11_Agent_Management.md)**
+   - Configuring Agent Skills and MCP Tools
+   - Role Descriptions and Decommissioning
 
 ---
 

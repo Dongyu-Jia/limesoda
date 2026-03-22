@@ -8,6 +8,9 @@ import Credentials from './pages/Credentials';
 import Settings from './pages/Settings';
 import Genesis from './pages/Genesis';
 import Agents from './pages/Agents';
+import Todo from './pages/Todo';
+import ClusterHealth from './pages/ClusterHealth';
+import AgentManagement from './pages/AgentManagement';
 
 function App() {
   return (
@@ -21,6 +24,9 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/genesis" element={<Genesis />} />
           <Route path="/agents" element={<Agents />} />
+          <Route path="/todo" element={<Todo />} />
+          <Route path="/agent-management" element={<AgentManagement />} />
+          <Route path="/health" element={<ClusterHealth />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>

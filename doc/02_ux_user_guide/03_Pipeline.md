@@ -1,50 +1,24 @@
-# User Guide: 03. The 10-Phase Pipeline Graph
+# DX User Guide: CUJ 3.6 Pipeline Intervention
 
-Limesoda operates on a fixed, high-governance 10-Phase SDLC. Each phase is a "Node" in our orchestration graph.
+## 1. Overview
+Pipeline Intervention allows humans to exert final authority over the Limesoda orchestration engine. This is critical for projects where specific phases (e.g., Security Review) must be performed by a human, or when the AI encounter a logic loop.
 
-| Phase | Name | Active Agent | Key Output |
-| :--- | :--- | :--- | :--- |
-| **P1** | Market Research | PM Agent | `Market_Feasibility_Report.md` |
-| **P2** | PRD | PM Agent | `PRD.md` |
-| **P3A** | Developer Exp (DX) | Designer | `DX_User_Guide.md` |
-| **P3B** | User Exp (UX) | Designer | `UX_prototype/` (Mock UI) |
-| **P4** | Architecture | Architect | `Architecture_RFC.md` |
-| **P5** | Milestone Planning | EM Agent | `Milestone_DAG.md` |
-| **P6** | Component Design | Architect | `Component_LLD.md` |
-| **P7** | Implementation | Developer | `Source Code (PR)` |
-| **P8** | Deployment | DevOps | `Terraform / K8s` |
-| **P9** | Observability | SRE | `Telemetry Config` |
-| **P10** | Iterative Routing | Architect | `Iteration_Constraint.md` |
+## 2. Global Flow Control
+The `isHaltedGlobal` state in the `ProjectContext` (mocked in `Agents.jsx`) controls the master switch.
+- **HALT**: All agents freeze in their current LangGraph node. No GitHub PRs are updated.
+- **RESUME**: The EM Agent re-evaluates the current phase state and wakes up relevant agents.
 
-## Phase Decomposition: From Nodes to Issues
-While the 10-Phase Graph represents the high-level orchestration, each **Phase (Node)** is a container for granular **GitHub Issues**.
-- An issue is the smallest unit of work, assigned to a specific **Agent Persona**.
+## 3. Manual Phase Override
+Each phase card in the 10-phase sidebar includes an `OVERRIDE` capability.
+- **Context**: Only available when a phase is `IN_PROGRESS`.
+- **Action**: Fulfilling a phase manually requires:
+    - **Resource Link**: A URL to the manual artifact (e.g., a manually merged PR).
+    - **Rationale**: Architectural or security justification.
+- **Transition**: Upon fulfillment, the system marks the phase as `COMPLETED (MANUAL)` and automatically advances execution to the next procedural stage.
 
-For example, in **Phase 7 (Implementation)**, multiple Developer Agents may work on different issues (e.g., `Issue #42: Setup Auth`, `Issue #43: API CRUD`) simultaneously within the same codebase.
-
-## Pipeline Customization (Phase Toggles)
-Some projects do not require the full 10-phase rigor. In **Project Settings**, you can disable phases (e.g., disable Phase 8 for a prototype that will never be deployed).
-
-Operational behavior:
-- A **disabled phase** is treated as **skipped by policy** (not “failed”).
-- Downstream phases that depend on disabled outputs may be blocked unless you **manually fulfill** the missing artifact.
-- If you re-enable a phase mid-flight, the EM will inject the necessary issues back into the correct phase.
-
-## Concurrent Phases & Feature Requests
-Limesoda's orchestration is non-linear. It is possible (and common) for **multiple phases to be in progress simultaneously**.
-
-- **Dynamic Injection:** If a user adds a new feature request while the pipeline is in Phase 7 (Implementation), a new issue will be injected into **Phase 2 (PRD)**.
-- **Parallel Execution:** High-priority bug fixes can move through Phases 1-7 in parallel with an ongoing major feature development.
-- **Global Context:** All active agents share the same "Working Memory" of the repository, ensuring that code generated in Phase 7 remains consistent with a new PRD being drafted in Phase 2.
-
-
-## The Automated Gates
-Each Phase ends with a **Gate**. A Gate consists of two **Reviewer Agents** (Micro/Sanity and Macro/Value) and one **Autonomous Judge**.
-- If the Judge scores the work < 9/10, the Agent is sent back to retry (Max 3 times).
-- After the Judge approves, the **Human Tech Lead** is notified for final sign-off.
-
-> [!TIP]
-> Approval is GitHub-native: you typically approve by reviewing/merging the PR for the phase’s artifact (PRD/RFC/LLD). See the exact rules in [GitHub Workflow](06_GitHub_Workflow.md).
-
----
-**Next Step:** [Monitoring your Agents in the Radar](04_Monitoring.md).
+## 4. Visual States
+| State | Indicator | Rationale |
+| :--- | :--- | :--- |
+| **Halted** | Red Pulse + Badge | Global kill-switch active. |
+| **Awaiting Human** | Violet Badge | Phase requires explicit human input before AI continues. |
+| **Manual Override** | Gray Label | Phase was fulfilled by a human tech lead. |

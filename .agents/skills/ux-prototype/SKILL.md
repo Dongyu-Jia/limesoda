@@ -61,7 +61,7 @@ After all judges output `{"status": "APPROVED"}`:
    - Review panel verdicts
 2. **STOP.** Do not proceed to Phase 4 until the human explicitly approves the interface contract.
 3. Use this block to request sign-off:
-4. Upon signoff update `doc/02_ux_user_guide/0x_cuj_name.md` with the CUJ expansion and UI mockups.
+4. Upon signoff update `doc/02_ux_user_guide/0x_cuj_name.md` with the CUJ expansion and UI mockups, if user changed anything, update PRD as well.
 
 
 ## Key Rules

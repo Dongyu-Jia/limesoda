@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useProject } from '../context/ProjectContext';
-import { LayoutDashboard, PlusCircle, Users, ShieldCheck, Settings, Sparkles, Activity, ChevronDown } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, Users, ShieldCheck, Settings, Sparkles, Activity, Terminal, ChevronDown, Cpu, Bell } from 'lucide-react';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -109,15 +109,19 @@ const Sidebar = () => {
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         <NavItem to="/" icon={<LayoutDashboard size={18} />} label="Dashboard" />
-        <NavItem to="/onboarding" icon={<PlusCircle size={18} />} label="New Project" />
         <NavItem to="/genesis" icon={<Sparkles size={18} />} label="New Feature" />
-        <NavItem to="/agents" icon={<Activity size={18} />} label="Runtime Radar" />
+        <NavItem to="/agents" icon={<Terminal size={18} />} label="Task Management" />
+        <NavItem to="/todo" icon={<Bell size={18} />} label="Human TODO" badge="3" />
+        <NavItem to="/agent-management" icon={<Cpu size={18} />} label="Agent Management" />
+        <NavItem to="/health" icon={<Activity size={18} />} label="Cluster Health" />
         <NavItem to="/team" icon={<Users size={18} />} label="Team Settings" />
         <NavItem to="/credentials" icon={<ShieldCheck size={18} />} label="Infrastructure" />
         <NavItem to="/settings" icon={<Settings size={18} />} label="Project Settings" />
       </nav>
 
       <div style={{ marginTop: 'auto', paddingTop: '32px' }}>
+        <NavItem to="/onboarding" icon={<PlusCircle size={18} />} label="New Project" />
+        <div style={{ height: '1px', background: 'var(--border)', margin: '16px 0' }}></div>
         <h4 style={{ fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: '16px', padding: '0 16px' }}>
           Recent Projects
         </h4>
@@ -130,7 +134,7 @@ const Sidebar = () => {
   );
 };
 
-const NavItem = ({ to, icon, label }) => (
+const NavItem = ({ to, icon, label, badge }) => (
   <NavLink 
     to={to} 
     style={({ isActive }) => ({
@@ -143,11 +147,26 @@ const NavItem = ({ to, icon, label }) => (
       display: 'flex',
       alignItems: 'center',
       gap: 12,
-      transition: 'all 0.2s'
+      transition: 'all 0.2s',
+      position: 'relative'
     })}
   >
     {icon}
-    {label}
+    <span style={{ flex: 1 }}>{label}</span>
+    {badge && (
+      <span style={{ 
+        background: '#EF4444', 
+        color: 'white', 
+        fontSize: '0.625rem', 
+        fontWeight: 900, 
+        padding: '2px 6px', 
+        borderRadius: '10px',
+        minWidth: '18px',
+        textAlign: 'center'
+      }}>
+        {badge}
+      </span>
+    )}
   </NavLink>
 );
 
