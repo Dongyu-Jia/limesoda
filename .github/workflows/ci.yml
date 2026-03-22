@@ -67,3 +67,29 @@ jobs:
         
       - name: Run Frontend Tests
         run: npm test -- --run # assuming vitest or similar
+
+  report-failure:
+    runs-on: ubuntu-latest
+    if: failure()
+    needs: [lint, test-api, test-web]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check for existing issue
+        id: check-issue
+        run: |
+          count=$(gh issue list --search "🔴 Fix workflow runs in:title is:open" --json number --jq 'length')
+          echo "count=$count" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Create Issue on Failure
+        if: steps.check-issue.outputs.count == '0'
+        run: |
+          gh issue create \
+            --title "🔴 Fix workflow runs" \
+            --body "The CI pipeline failed. Please check the logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --label "bug" \
+            --label "core"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
