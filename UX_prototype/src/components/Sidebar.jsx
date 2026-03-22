@@ -24,9 +24,22 @@ const Sidebar = () => {
       height: '100vh',
       zIndex: 100
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px' }}>
-        <img src="/logo.png" alt="Limesoda" style={{ width: 32, height: 32 }} />
-        <h1 style={{ fontFamily: 'Outfit', fontSize: '1.25rem', fontWeight: 700 }}>Limesoda</h1>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '20px', marginBottom: '56px' }}>
+        <div style={{ 
+          background: 'white', 
+          padding: '12px', 
+          borderRadius: '16px', 
+          boxShadow: '0 8px 30px rgba(212, 255, 0, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <img src="/logo.png" alt="Limesoda" style={{ width: 64, height: 64, objectFit: 'contain' }} />
+        </div>
+        <div>
+          <h1 style={{ fontFamily: 'Outfit', fontSize: '1.75rem', fontWeight: 900, letterSpacing: '-0.03em', color: '#1A1C1E', lineHeight: 1 }}>Limesoda</h1>
+          <div style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--primary-dark)', letterSpacing: '0.15em', marginTop: '4px' }}>Control Plane</div>
+        </div>
       </div>
 
       <div style={{ padding: '0 8px', marginBottom: '32px', position: 'relative' }}>

@@ -12,13 +12,16 @@ import {
 
 const ClusterHealth = () => {
   return (
-    <div className="page-fade-in" style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
-      <header style={{ marginBottom: '48px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary-dark)', marginBottom: '8px' }}>
-          <Activity size={20} />
-          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem' }}>Infrastructure Intelligence</span>
+    <div className="page-container">
+      <header className="page-header">
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary-dark)', marginBottom: '8px' }}>
+            <Activity size={20} />
+            <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem' }}>Infrastructure Intelligence</span>
+          </div>
+          <h1 className="page-title">Cluster Health</h1>
+          <p className="page-subtitle">Real-time telemetry for the Limesoda compute and orchestration layer.</p>
         </div>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, fontFamily: 'Outfit', color: '#1A1C1E' }}>Cluster Health</h1>
       </header>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '40px' }}>

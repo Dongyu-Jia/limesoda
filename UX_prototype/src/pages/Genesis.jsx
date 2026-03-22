@@ -5,13 +5,15 @@ const Genesis = () => {
   const { activeProject } = useProject();
 
   return (
-    <div className="fade-in">
-      <header style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontFamily: 'Outfit', fontSize: '2rem', marginBottom: '8px' }}>The Genesis Prompt</h2>
-        <p style={{ color: 'var(--text-muted)' }}>Briefing the agents for <strong>{activeProject.codename}</strong>.</p>
+    <div className="page-container">
+      <header className="page-header">
+        <div>
+          <h1 className="page-title">The Genesis Prompt</h1>
+          <p className="page-subtitle">Briefing the agents for <strong>{activeProject.codename}</strong> to begin autonomous construction.</p>
+        </div>
       </header>
 
-      <div className="glass-card" style={{ maxWidth: '800px', margin: '0 auto', padding: '48px' }}>
+      <div className="section-card" style={{ padding: '48px' }}>
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <img src="/logo.png" style={{ width: 64, height: 64, marginBottom: '16px' }} />
           <h3 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>What are we building today?</h3>

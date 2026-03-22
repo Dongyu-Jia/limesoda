@@ -8,8 +8,11 @@ const Layout = ({ children }) => {
       <main style={{ 
         marginLeft: 'var(--sidebar-width)', 
         flexGrow: 1, 
-        padding: '40px',
-        maxWidth: '1200px'
+        minHeight: '100vh',
+        paddingBottom: 'var(--footer-height)',
+        width: 'calc(100% - var(--sidebar-width))',
+        display: 'flex',
+        flexDirection: 'column'
       }}>
         {children}
       </main>

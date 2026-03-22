@@ -122,16 +122,17 @@ const TaskManagement = () => {
   }, [selectedPhase, searchQuery, statusFilter, sortKey]);
 
   return (
-    <div className="page-fade-in" style={{ padding: '40px', maxWidth: '1800px', margin: '0 auto' }}>
-      <header style={{ marginBottom: '48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="page-container">
+      <header className="page-header">
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary-dark)', marginBottom: '8px' }}>
             <Terminal size={20} />
             <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem' }}>Live Orchestration</span>
           </div>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 900, fontFamily: 'Outfit', letterSpacing: '-0.02em', color: '#1A1C1E' }}>
+          <h1 className="page-title">
             {activeProject.codename} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>/ Task Management</span>
           </h1>
+          <p className="page-subtitle">Real-time surveillance of agent cognitive cycles and pipeline state.</p>
         </div>
 
         <div style={{ display: 'flex', gap: '16px' }}>

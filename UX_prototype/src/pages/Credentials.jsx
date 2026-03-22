@@ -27,23 +27,21 @@ const Credentials = () => {
   );
 
   return (
-    <div className="page-fade-in" style={{ padding: '40px', maxWidth: '1400px', margin: '0 auto' }}>
-      <header style={{ marginBottom: '48px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--primary-dark)', marginBottom: '12px' }}>
-          <ShieldCheck size={20} />
-          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem' }}>Security & Governance</span>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-          <div>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 900, fontFamily: 'Outfit', letterSpacing: '-0.02em', color: '#1A1C1E' }}>Infrastructure Secrets</h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1.125rem', marginTop: '8px', maxWidth: '800px' }}>
-              Think of this as your organization's universal `.env` store. All variables are key-value pairs used for AI orchestration, environment scoping, and project deployment.
-            </p>
+    <div className="page-container">
+      <header className="page-header">
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--primary-dark)', marginBottom: '12px' }}>
+            <ShieldCheck size={20} />
+            <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem' }}>Security & Governance</span>
           </div>
-          <button className="hover-lift" style={{ background: 'var(--primary)', color: '#1A1C1E', border: 'none', padding: '14px 28px', borderRadius: '14px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', boxShadow: '0 4px 15px rgba(212, 255, 0, 0.3)' }}>
-            <Plus size={20} /> Add New Variable
-          </button>
+          <h1 className="page-title">Infrastructure Secrets</h1>
+          <p className="page-subtitle" style={{ maxWidth: '800px' }}>
+            Organization-wide `.env` store for AI orchestration, environment scoping, and project deployment.
+          </p>
         </div>
+        <button className="btn btn-primary">
+          <Plus size={20} /> Add New Variable
+        </button>
       </header>
 
       {/* Search & Stats */}

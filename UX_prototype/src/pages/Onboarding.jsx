@@ -2,10 +2,12 @@ import React from 'react';
 
 const Onboarding = () => {
   return (
-    <div className="fade-in">
-      <header style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontFamily: 'Outfit', fontSize: '2rem', marginBottom: '8px' }}>Onboard New Project</h2>
-        <p style={{ color: 'var(--text-muted)' }}>Complete the binding to initialize the SDLC pipeline.</p>
+    <div className="page-container">
+      <header className="page-header">
+        <div>
+          <h1 className="page-title">Onboard New Project</h1>
+          <p className="page-subtitle">Complete the binding to initialize the autonomous SDLC pipeline.</p>
+        </div>
       </header>
 
       <div className="glass-card">

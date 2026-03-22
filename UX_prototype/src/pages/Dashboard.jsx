@@ -6,18 +6,20 @@ const Dashboard = () => {
   const { activeProject } = useProject();
 
   return (
-    <div className="fade-in">
-      <header style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontFamily: 'Outfit', fontSize: '2rem', marginBottom: '8px' }}>Project Registry</h2>
-        <p style={{ color: 'var(--text-muted)' }}>Currently managing <strong>{activeProject.codename}</strong> and associated environments.</p>
+    <div className="page-container">
+      <header className="page-header">
+        <div>
+          <h2 className="page-title">Project Registry</h2>
+          <p className="page-subtitle">Currently managing <strong>{activeProject.codename}</strong> and associated environments.</p>
+        </div>
+        <Link to="/onboarding" className="btn btn-primary">
+          <Plus size={18} /> New Project
+        </Link>
       </header>
 
-      <div className="glass-card">
+      <div className="section-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h3 style={{ fontSize: '1.25rem' }}>Active Projects</h3>
-          <Link to="/onboarding" className="btn btn-primary">
-            <Plus size={18} /> New Project
-          </Link>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Active Projects</h3>
         </div>
 
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>

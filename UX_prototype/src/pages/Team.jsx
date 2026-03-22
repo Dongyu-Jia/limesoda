@@ -3,10 +3,12 @@ import { UserPlus } from 'lucide-react';
 
 const Team = () => {
   return (
-    <div className="fade-in">
-      <header style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontFamily: 'Outfit', fontSize: '2rem', marginBottom: '8px' }}>Team Management</h2>
-        <p style={{ color: 'var(--text-muted)' }}>Manage human engineers for agent-to-human escalation.</p>
+    <div className="page-container">
+      <header className="page-header">
+        <div>
+          <h1 className="page-title">Team Management</h1>
+          <p className="page-subtitle">Manage human engineers for agent-to-human escalation and governance.</p>
+        </div>
       </header>
 
       <div className="glass-card">

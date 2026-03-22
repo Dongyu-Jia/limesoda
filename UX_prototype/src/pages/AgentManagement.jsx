@@ -48,16 +48,17 @@ const AgentManagement = () => {
   const selectedAgent = agents.find(a => a.id === selectedAgentId);
 
   return (
-    <div className="page-fade-in" style={{ padding: '40px', maxWidth: '1400px', margin: '0 auto' }}>
-      <header style={{ marginBottom: '48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="page-container">
+      <header className="page-header">
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary-dark)', marginBottom: '8px' }}>
             <Cpu size={20} />
             <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem' }}>Agent Registry</span>
           </div>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 900, fontFamily: 'Outfit', color: '#1A1C1E' }}>Agent Management</h1>
+          <h1 className="page-title">Agent Management</h1>
+          <p className="page-subtitle">Configure, deploy, and decommission specialized cognitive agents.</p>
         </div>
-        <button className="hover-lift" style={{ background: 'var(--primary)', color: '#1A1C1E', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+        <button className="btn btn-primary">
           <Plus size={18} /> Deploy New Agent
         </button>
       </header>

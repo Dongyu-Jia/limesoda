@@ -4,10 +4,12 @@ const Settings = () => {
   const { activeProject } = useProject();
 
   return (
-    <div className="fade-in">
-      <header style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontFamily: 'Outfit', fontSize: '2rem', marginBottom: '8px' }}>Project Protocol</h2>
-        <p style={{ color: 'var(--text-muted)' }}>Customize the 10-Phase SDLC Pipeline for <strong>{activeProject.codename}</strong>.</p>
+    <div className="page-container">
+      <header className="page-header">
+        <div>
+          <h1 className="page-title">Project Protocol</h1>
+          <p className="page-subtitle">Customize the 10-Phase SDLC Pipeline for <strong>{activeProject.codename}</strong>.</p>
+        </div>
       </header>
 
       <div className="glass-card">

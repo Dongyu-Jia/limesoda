@@ -10,8 +10,10 @@
   --text-muted: #64748B;
   --border: rgba(0, 0, 0, 0.08);
   --accent-red: #EF4444;
-  --sidebar-width: 260px;
+  --sidebar-width: 280px;
   --radius: 12px;
+  --header-height: 80px;
+  --footer-height: 48px;
 }
 
 * {
@@ -66,4 +68,68 @@ body {
 
 .project-bubble-glow {
   animation: intense-glow 2s infinite alternate ease-in-out;
+}
+
+/* Layout Standardization */
+.page-container {
+  width: 100%;
+  padding: 40px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-header {
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.page-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.section-card {
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  width: 100%;
+}
+
+.registry-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: white;
+}
+
+/* Scrollbar Styling for Task Registry */
+.registry-table-wrapper::-webkit-scrollbar {
+  height: 10px;
+}
+.registry-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+.registry-table-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 5px;
+}
+.registry-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

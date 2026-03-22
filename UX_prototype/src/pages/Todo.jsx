@@ -26,13 +26,16 @@ const TodoPage = () => {
   ];
 
   return (
-    <div className="page-fade-in" style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
-      <header style={{ marginBottom: '40px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-muted)', marginBottom: '8px' }}>
-          <Bell size={18} />
-          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem' }}>Attention Required</span>
+    <div className="page-container">
+      <header className="page-header">
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-muted)', marginBottom: '8px' }}>
+            <Bell size={18} />
+            <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem' }}>Attention Required</span>
+          </div>
+          <h1 className="page-title">Human TODO</h1>
+          <p className="page-subtitle">Centralized inbox for intervention, review, and infrastructure errors.</p>
         </div>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, fontFamily: 'Outfit' }}>Human TODO</h1>
       </header>
 
       {/* Tabs */}
