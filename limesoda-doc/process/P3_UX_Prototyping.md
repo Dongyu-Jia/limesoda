@@ -13,5 +13,6 @@
 5. `P3.5_AGENT_PEER_REVIEW`: An independent QA reviews the prototypes against the Design System (Template Group) and CUJ coverage.
 6. `P3.6_HUMAN_REVIEW`: Present the validated models to the human user for evaluation.
 7. `P3.7_PROTOTYPE_APPROVAL`: Explicit user sign-off on the interface contract.
+    - refine PRD, refine user guide and got final approval from user
 
 *Note: The generated UI code or API docs from this stage are meant strictly as an interface contract. Execution Agents in Phase 5 will use it as a reference for actual implementation.*

@@ -6,7 +6,7 @@
 
 ## 1. Product Context & Vision
 ### 1.1 Summary
-Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaotic nature of LLM software engines by offering a highly governed, 10-Phase SDLC pipeline. While the agents output code directly into GitHub Pull Requests, the heart of Limesoda is the **Control Plane Dashboard**. This UI allows users to onboard projects, monitor the real-time runtime state of multi-agent networks, and manually override pipeline stages. This guarantees humans can bypass the AI at any time if they prefer to write an architecture schematic or component LLD themselves.
+Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaotic nature of LLM software engines by offering a highly governed, 10-Phase SDLC pipeline. While the agents output code directly into GitHub Pull Requests, the heart of Limesoda is the **Control Plane Dashboard**. This UI allows users to onboard projects, manage real-time agent tasks via the 10-Phase Registry, and manually override pipeline stages. This guarantees humans can bypass the AI at any time if they prefer to write an architecture schematic or component LLD themselves.
 
 ### 1.2 Feasibility & Constraints 
 - **Technical Capabilities Required:** A Next.js/React Web Dashboard interfacing with a backend LLM orchestration framework (LangGraph).
@@ -30,7 +30,7 @@ Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaot
 ### 3.1 CUJ: Tenant & Project Onboarding
 * **User Goal:** Link a new software project to Limesoda's brain.
 * **Accessible By (Roles):** Organization Lead
-* **Screen Name / URL Path:** `/dashboard/projects/new`
+* **Screen Name / URL Path:** `/onboarding`
 * **User Flow:** 
     - Step 1: User creates a new project and authorizes the Limesoda GitHub App (or inputs a PAT). 
     - Step 2: User navigates to the "Infrastructure Bindings" tab, inputs 4 GCP Service Accounts (Dev, Test, Staging, Prod). System vaults these.
@@ -41,7 +41,7 @@ Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaot
 ### 3.2 CUJ: Organization Team Management
 * **User Goal:** Invite other engineers so the EM Agent knows exactly who to tag for escalations.
 * **Accessible By (Roles):** Organization Lead
-* **Screen Name / URL Path:** `/dashboard/org/team`
+* **Screen Name / URL Path:** `/team`
 * **User Flow:** 
     - Step 1: User opens Team Settings in the dashboard.
     - Step 2: User adds an engineer by inputting their precise GitHub username (`@jane-doe`) and assigning them a Role (`Human Tech Lead`).
@@ -59,7 +59,7 @@ Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaot
 ### 3.4 CUJ: Triggering a New Feature (The Genesis Prompt)
 * **User Goal:** Generate Limesoda software safely by dropping an initial abstract idea.
 * **Accessible By (Roles):** Human Tech Lead
-* **Screen Name / URL Path:** `/dashboard/projects/[id]/new-feature`
+* **Screen Name / URL Path:** `/genesis`
 * **User Flow:** 
     - Step 1: Human logs into the Web Dashboard and types their idea into the form: "Build a Stripe Checkout UI."
     - Step 2: The Control Plane backend receives the prompt and wakes up the EM Agent.
@@ -69,30 +69,30 @@ Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaot
 ### 3.5 CUJ: Task Management (The Agent Registry)
 * **User Goal:** See exactly what the AI crew is doing without digging through CI logs.
 * **Accessible By (Roles):** Human Tech Lead
-* **Screen Name / URL Path:** `/dashboard/projects/[id]/tasks`
+* **Screen Name / URL Path:** `/agents`
 * **User Flow:** 
     - Step 1: User opens Task Management (live registry of the 10-Phase Pipeline).
-    - Step 2: It highlights exactly which agent is active on **specific GitHub Issues** (e.g., "Developer Agent (A3) is `In Progress` on Issue #42").
-    - Step 3: Users can inspect individual issue buffers (prompts, models) and perform granular halts/overrides.
-    - Step 4: Access "EM Escalation Logs" via a side-panel for failed nodes.
+    - Step 2: High-density 1800px table displays exact agent activity on **GitHub Issues**.
+    - Step 3: Users can inspect truncated prompt buffers (first 30 words) or click to view raw modal.
+    - Step 4: Access sorting/filtering by status (Working, Finished, Pending Human).
 
 ### 3.10 CUJ: Cluster-wide Health & Observability
 * **User Goal:** Monitor the underlying infrastructure and orchestration engine status.
 * **Accessible By (Roles):** System Admin, Organization Lead
-* **Screen Name / URL Path:** `/dashboard/health`
+* **Screen Name / URL Path:** `/health`
 * **User Flow:**
     - Step 1: User opens Cluster Health from the global navigation.
     - Step 2: System displays Node counts, Orchestration Latency, and Global Agent Backlog across all projects.
 
 ### 3.6 CUJ: Pipeline Intervention (Pause & Resume)
-* **User Goal:** Low-friction, native ability to pause the AI to read code or manually fulfill a phase.
+* **User Goal:** Low-friction mastery over AI orchestration.
 * **Accessible By (Roles):** Human Tech Lead
-* **Screen Name / URL Path:** `/dashboard/projects/[id]/pipeline`
+* **Screen Name / URL Path:** `/agents`
 * **User Flow:** 
-    - Step 1: The Human sees the AI is generating code for Issue #42 but wants to halt it momentarily.
-    - Step 2: The Human clicks the explicit "Pause Agent Execution" button on the Dashboard.
-    - Step 3: Limesoda halts the LangGraph node via a backend database flag. The AI completely stops commenting/pushing to GitHub.
-    - Step 4: The Human can optionally fulfill the task themselves (write the code/LLD in a PR), merge it, and click "Resume Execution" to wake the AI back up safely on the next step.
+    - Step 1: Human clicks "PAUSE ALL AGENTS" to halt global LangGraph execution.
+    - Step 2: System displays "GLOBAL EXECUTION HALTED" banner; active tasks show "Halted" status.
+    - Step 3: Human clicks "OVERRIDE" on an active phase (e.g., P7) to fulfill it manually.
+    - Step 4: System marks phase as "MANUAL OVERRIDE" and automatically advances to the next phase.
 
 ### 3.7 CUJ: Active Human Notification & Routing
 * **User Goal:** The human is proactively alerted when the AI needs approval.
@@ -114,27 +114,30 @@ Limesoda is an Enterprise AI Orchestration SaaS Platform. It abstracts the chaot
     - Step 4: The **EM Agent** sees the closure and generates the next procedural issue (*"Gate 1: Tech Lead Approval"*), assigning it to the specific Human TL mapped via CUJ 3.2.
     - Step 5: Every agent action is tracked meticulously in the GitHub Issue timeline forever.
 
-### 3.9 CUJ: The Architectural Rollback (EM Remediation)
-* **User Goal:** Ensure the AI doesn't get trapped in an infinite coding loop due to a flawed design.
-* **Accessible By (Roles):** Agent: EM (A6), Agent: Architect (A2), Human Tech Lead
-* **Screen Name / URL Path:** `GitHub Pull Requests`
-* **User Flow:** 
-    - Step 1: If the Developer Agent fails functional tests repeatedly, the **EM Agent** intervenes, upgrading execution to a high-reasoner LLM (Claude Opus/GPT-4o) to retry.
-    - Step 2: If the upgraded model fails, the EM routes the task backward, waking the **Architect Agent (A2)** to redesign the component.
-    - Step 3: Architect submits an updated LLD as a Pull Request. 
-    - Step 4: For major changes, the EM assigns the PR to the Human Tech Lead for explicit Gate Approval.
-    - Step 5: **Hard Limit:** After 3 redesign failures, the EM Agent halts the pipeline and escalates directly to the Human Tech Lead.
-* **Model Upgrade Mechanism:** The EM Agent performs an "Upgrade" by:
-    1. Swapping the active `LLM_MODEL_ID` from the "Default" (e.g., `gemini-2.0-flash`) to the "Reasoning" model (e.g., `gemini-2.0-pro`).
-    2. Setting `temperature` to `0.0`.
-    3. Injecting the full `remediation_plan` JSON from the Judge into the very first line of the new prompt buffer.
+### 3.11 CUJ: Human TODO Central (The Accountability Hub)
+* **User Goal:** Centralized visibility into all human blockers.
+* **Accessible By (Roles):** Human Tech Lead, Organization Lead
+* **Screen Name / URL Path:** `/todo`
+* **User Flow:**
+    - Step 1: Human monitors the Sidebar for a red notification badge.
+    - Step 2: Human opens the TODO Hub, categorized by "Review", "Escalation", and "Infra Error".
+    - Step 3: Human takes immediate action (Start Review, Resolve Infra) to unblock the AI.
+
+### 3.12 CUJ: Infrastructure Credentials Refinement (K-V Vault)
+* **User Goal:** Securely manage versatile environment variables for AI and Cloud.
+* **Accessible By (Roles):** Organization Lead
+* **Screen Name / URL Path:** `/credentials`
+* **User Flow:**
+    - Step 1: User vaults primary AI Provider keys (Gemini, OpenAI).
+    - Step 2: User configuration environment-specific GCP Project IDs (AUTOPUSH, TEST, STAGING, PROD).
+    - Step 3: System masks these values with "Secret View" toggles and audit-logging.
 
 ---
 
 ## 4. Non-Functional Requirements (NFRs)
 * **Scalability:** The Control Plane DB must support multi-tenancy (1 Organization -> N Projects -> N Repositories).
 * **Performance:** 
-    - **Radar Latency:** Agent state updates (WIP, Failed, Blocked) must reflect on the Dashboard UI via Websockets with a **P99 latency of < 500ms**.
+    - **Registry Latency:** Agent state updates (WIP, Failed, Blocked) must reflect on the Dashboard UI via Websockets with a **P99 latency of < 500ms**.
     - **Prompt Generation:** The Control Plane must initiate an Agent node within **2 seconds** of a webhook/UI trigger.
 * **Data Persistence:** The system database (e.g., Postgres) tracks project metadata, user sessions, and vaulted secrets. The target GitHub repository remains the absolute source of truth for all SDLC artifacts (PRDs, LLDs, Code).
 * **Security Requirements:** All GCP/AWS service accounts must be encrypted at rest utilizing a KMS (Key Management Service).
