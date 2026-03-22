@@ -1,0 +1,106 @@
+# Process definition for a Coding Implementation Agent
+#
+# Flow:
+#   planner → coder → test_runner → code_reviewer
+#   code_reviewer ──(PASS)─────────────► deployer   → END
+#   code_reviewer ──(FAIL)─────────────► coder      (fix loop)
+#   code_reviewer ──(ESCALATE)─────────► escalate   → END
+#
+# OverrideRule: coder capped at 5 runs → ESCALATE_TO_HUMAN
+
+id: "coding-agent-001"
+name: "Coding Implementation Agent"
+entry_node_id: "planner"
+
+nodes {
+  id: "planner"
+  name: "Planner"
+  description: "Breaks down the task into implementation steps, identifies files to modify, and creates a plan"
+  input_instruction: "Analyze the task, read relevant code, and produce a step-by-step implementation plan"
+  agent {
+    id: "a1-planner"
+    name: "A1-Tech-Lead-Planner"
+    description: "Senior engineer who decomposes tasks into atomic implementation steps"
+    type: AGENT_TYPE_CLAUDE_CODE
+  }
+}
+
+nodes {
+  id: "coder"
+  name: "Coder"
+  description: "Implements the plan by writing/modifying code files"
+  input_instruction: "Follow the implementation plan and write production-quality code"
+  agent {
+    id: "a2-coder"
+    name: "A2-Software-Engineer"
+    description: "Implementation-focused engineer that writes clean, tested code"
+    type: AGENT_TYPE_CLAUDE_CODE
+  }
+}
+
+nodes {
+  id: "test_runner"
+  name: "Test Runner"
+  description: "Executes the test suite and reports pass/fail with details"
+  input_instruction: "Run all relevant tests and report results with any failure details"
+  agent {
+    id: "a3-test-runner"
+    name: "A3-QA-Engineer"
+    description: "Automated test execution agent"
+    type: AGENT_TYPE_CLAUDE_CODE
+  }
+}
+
+nodes {
+  id: "code_reviewer"
+  name: "Code Reviewer"
+  description: "Reviews code changes for quality, correctness, and adherence to standards"
+  input_instruction: "Review the code diff for bugs, style issues, and architectural compliance"
+  agent {
+    id: "a4-reviewer"
+    name: "A4-Senior-Reviewer"
+    description: "Experienced code reviewer enforcing quality gates"
+    type: AGENT_TYPE_CLAUDE_CODE
+  }
+}
+
+nodes {
+  id: "deployer"
+  name: "Deployer"
+  description: "Creates PR and initiates deployment pipeline"
+  input_instruction: "Create a pull request with the approved changes and trigger CI/CD"
+  agent {
+    id: "a5-deployer"
+    name: "A5-Release-Engineer"
+    description: "Handles git operations and deployment"
+    type: AGENT_TYPE_CLAUDE_CODE
+  }
+}
+
+nodes {
+  id: "escalate"
+  name: "Escalate"
+  description: "Code review failed too many times — escalates to human developer"
+  input_instruction: "Alert the human developer that automated coding has exhausted its retry budget"
+}
+
+# Linear edges
+edges { from_node_id: "planner"      to_node_id: "coder"          on_status: OUTPUT_STATUS_UNSPECIFIED }
+edges { from_node_id: "coder"        to_node_id: "test_runner"    on_status: OUTPUT_STATUS_UNSPECIFIED }
+edges { from_node_id: "test_runner"  to_node_id: "code_reviewer"  on_status: OUTPUT_STATUS_UNSPECIFIED }
+
+# Conditional edges from code_reviewer
+edges { from_node_id: "code_reviewer"  to_node_id: "deployer"  on_status: PASS }
+edges { from_node_id: "code_reviewer"  to_node_id: "coder"     on_status: FAIL }
+edges { from_node_id: "code_reviewer"  to_node_id: "escalate"  on_status: ESCALATE_TO_HUMAN }
+
+# Terminal edges
+edges { from_node_id: "deployer"  to_node_id: "end"  on_status: OUTPUT_STATUS_UNSPECIFIED }
+edges { from_node_id: "escalate"  to_node_id: "end"  on_status: OUTPUT_STATUS_UNSPECIFIED }
+
+# Override: cap coder retries
+rules {
+  node_id: "coder"
+  max_runs: 5
+  override_status: ESCALATE_TO_HUMAN
+}

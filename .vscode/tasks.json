@@ -1,0 +1,53 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Python: Sync Environment",
+            "type": "shell",
+            "command": "bash get-started/setup-python-env.sh",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Python: Run Tests (uv)",
+            "type": "shell",
+            "command": "uv run pytest",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$python-pytest"
+        },
+        {
+            "label": "Python: Lint & Format (uv)",
+            "type": "shell",
+            "command": "uv run flake8 . && uv run black .",
+            "group": "none",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Compiler: Update All Diagrams",
+            "type": "shell",
+            "command": "uv run python engine/nodes/update_diagrams.py",
+            "group": "none",
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "CI: Run Local GitHub Actions (act)",
+            "type": "shell",
+            "command": "act -j test-python",
+            "group": "none",
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

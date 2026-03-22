@@ -7,47 +7,30 @@ on:
     branches: [ main ]
 
 jobs:
-  lint:
+  test-python:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: '3.12'
-          
-      - name: Install Python Linting Tools
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8 black
-          
-      - name: Lint with flake8
-        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        
-      - name: Check formatting with black
-        run: black --check .
-
-  test-api:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+          enable-cache: true
           
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install fastapi uvicorn pytest prisma
+          uv sync --frozen --python 3.13
           
+      - name: Lint
+        run: |
+          uv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          uv run black --check .
+
       - name: Generate Prisma Client
-        run: prisma generate --schema=schema/prisma/schema.prisma
+        run: uv run prisma generate --schema=schema/prisma/schema.prisma
         
       - name: Run Backend Tests
-        run: pytest
+        run: uv run pytest
 
   test-web:
     runs-on: ubuntu-latest
@@ -71,7 +54,7 @@ jobs:
   report-failure:
     runs-on: ubuntu-latest
     if: failure()
-    needs: [lint, test-api, test-web]
+    needs: [test-python, test-web]
     permissions:
       issues: write
       contents: read

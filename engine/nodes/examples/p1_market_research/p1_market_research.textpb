@@ -1,0 +1,105 @@
+# Process definition for P1 Market Research
+# Mirrors the graph in engine/p1_market_research.py
+#
+# Flow:
+#   generator → reviewer_data → reviewer_strategy → judge
+#   judge ──(PASS)──────────► human_gate → END
+#   judge ──(FAIL)──────────► generator  (retry loop)
+#   judge ──(ESCALATE)──────► escalate   → END
+#
+# OverrideRule: generator capped at 3 runs → ESCALATE_TO_HUMAN
+
+id: "p1-market-research-001"
+name: "P1 Market Research"
+entry_node_id: "generator"
+
+nodes {
+  id: "generator"
+  name: "Generator"
+  description: "PM agent researches competitors, market size, and drafts Market Feasibility Report"
+  input_instruction: "Research the genesis idea using web search and write a Market_Feasibility_Report.md"
+  agent {
+    id: "a1-pm"
+    name: "A1-Product-Manager"
+    description: "Cynical, deeply analytical PM agent"
+    instructions_md: "limesoda-doc/prompts/P1_Market_Research/01_Generator.md"
+    type: AGENT_TYPE_CLAUDE_CODE
+  }
+}
+
+nodes {
+  id: "reviewer_data"
+  name: "Reviewer: Data Analyst"
+  description: "Audits micro-level claims — competitor accuracy, TAM/SAM numbers, cost estimates"
+  input_instruction: "Perform strict factual audit of the Market Feasibility Report"
+  agent {
+    id: "a2-data-analyst"
+    name: "A2-Data-Analyst"
+    description: "Pedantic fact-checker for market data"
+    instructions_md: "limesoda-doc/prompts/P1_Market_Research/02a_Reviewer_Data_Analyst.md"
+    type: AGENT_TYPE_CLAUDE_CODE
+  }
+}
+
+nodes {
+  id: "reviewer_strategy"
+  name: "Reviewer: Strategy Expert"
+  description: "Audits macro strategy — PMF wedge, defensible moat, monetization reality"
+  input_instruction: "Audit the overarching macro strategy and business viability"
+  agent {
+    id: "a3-strategy"
+    name: "A3-Strategy-Lead"
+    description: "Ex-VC partner focused on PMF and GTM viability"
+    instructions_md: "limesoda-doc/prompts/P1_Market_Research/02b_Reviewer_Strategy.md"
+    type: AGENT_TYPE_CLAUDE_CODE
+  }
+}
+
+nodes {
+  id: "judge"
+  name: "Judge"
+  description: "Scores the report on Data Rigor, Strategic Wedge, and Risk Assessment (9+ to pass)"
+  input_instruction: "Score the Market Feasibility Report using the strict rubric"
+  agent {
+    id: "a4-judge"
+    name: "A4-Principal-PM"
+    description: "Uncompromising gate controller with ruthless grading curve"
+    instructions_md: "limesoda-doc/prompts/P1_Market_Research/03_Judge.md"
+    type: AGENT_TYPE_CLAUDE_CODE
+  }
+}
+
+nodes {
+  id: "human_gate"
+  name: "Human Gate"
+  description: "Creates GitHub PR for human tech lead review — merge to approve Gate 1"
+  input_instruction: "Create a PR with the approved report and assign to tech lead"
+}
+
+nodes {
+  id: "escalate"
+  name: "Escalate"
+  description: "Max retries reached — escalates to human for manual intervention"
+  input_instruction: "Alert human that automated process has exhausted retry budget"
+}
+
+# Linear edges
+edges { from_node_id: "generator"          to_node_id: "reviewer_data"      on_status: OUTPUT_STATUS_UNSPECIFIED }
+edges { from_node_id: "reviewer_data"      to_node_id: "reviewer_strategy"  on_status: OUTPUT_STATUS_UNSPECIFIED }
+edges { from_node_id: "reviewer_strategy"  to_node_id: "judge"              on_status: OUTPUT_STATUS_UNSPECIFIED }
+
+# Conditional edges from judge
+edges { from_node_id: "judge"  to_node_id: "human_gate"  on_status: PASS }
+edges { from_node_id: "judge"  to_node_id: "generator"   on_status: FAIL }
+edges { from_node_id: "judge"  to_node_id: "escalate"    on_status: ESCALATE_TO_HUMAN }
+
+# Terminal edges
+edges { from_node_id: "human_gate"  to_node_id: "end"  on_status: OUTPUT_STATUS_UNSPECIFIED }
+edges { from_node_id: "escalate"    to_node_id: "end"  on_status: OUTPUT_STATUS_UNSPECIFIED }
+
+# Override: cap generator retries
+rules {
+  node_id: "generator"
+  max_runs: 3
+  override_status: ESCALATE_TO_HUMAN
+}
