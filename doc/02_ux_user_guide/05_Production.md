@@ -5,10 +5,17 @@ Limesoda’s value doesn't end when your code is merged. The system monitors you
 ## Phase 8: Deployment (Automated CI/CD)
 Once Phase 7 code is approved, the **DevOps Agent** generates the Terraform or Docker manifests. Limesoda manages the deployment secrets and triggers your GitHub Actions / GitLab Runners.
 
+Operational expectations:
+- Phase 8 typically targets **Dev/Test/Staging first**, then **Prod** after validation.
+- If you do not want Limesoda to deploy (e.g., internal scripts), disable Phase 8 in Project Settings.
+
 ## Phase 9: Runtime Observability
 Limesoda injects **Sentry / DataDog / CloudWatch** tracing into your app.
 - It tracks the **SLOs** defined in Phase 4 (e.g. Is latency actually < 200ms?).
 - It reports these metrics directly back to the **Limesoda Dashboard**.
+
+> [!TIP]
+> If you already have an observability stack, Phase 9 can be configured to “adopt” existing SDKs/config instead of re-instrumenting. Ensure your Phase 4 Architecture RFC calls this out explicitly.
 
 ## Phase 10: The Iterative Loop (The "Self-Healer")
 If Phase 9 detects a production crash or a performance bottleneck:

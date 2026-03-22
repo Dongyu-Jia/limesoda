@@ -19,6 +19,15 @@ Welcome to the Limesoda Control Plane. Limesoda is not just a code generator; it
    - Deployment (Phase 8)
    - Real-time Observability (Phase 9)
    - Structural Remediations (Phase 10)
+6. **[GitHub Workflow: Issues, PRs, and Approvals](06_GitHub_Workflow.md)**
+   - How Limesoda interprets approvals, merges, and comments
+   - How to request re-runs and handle parallel work
+7. **[Troubleshooting & Recovery Playbooks](07_Troubleshooting.md)**
+   - Common onboarding failures (PAT scopes, invalid cloud keys)
+   - Stuck phases, repeated judge rejections, and hard limits
+8. **[Security, Privacy, and Auditability](08_Security_Privacy.md)**
+   - Secret vaulting, redaction, and access control
+   - Log visibility and retention expectations
 
 ---
 

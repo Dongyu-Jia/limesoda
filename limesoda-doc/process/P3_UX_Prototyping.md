@@ -7,8 +7,8 @@
 
 ## Small Processes:
 1. `P3.1_PROTOTYPE_PARSING`: Parse the PRD to determine the required system interfaces.
-2. `P3.2_GENERATE_DX_PROTOTYPE (P3A)`: The DX Agent generates the API user guide utilizing `doc/templates/DX_User_Guide_Template.md` to preview the developer experience (DX) via explicit JSON stubs and mock usage flows. **Executed as individual sub-tasks for each CUJ.**
-3. `P3.3_GENERATE_UX_PROTOTYPE (P3B)`: If a visual UI is required, the UX Agent generates high-fidelity HTML/CSS mockups in the `UX_prototype/` folder. **This includes all 6 core feature screens and functional sidebar navigation.**
+2. `P3.2_GENERATE_DX_PROTOTYPE (P3A)`: The DX Agent generates the API user guide utilizing `doc/templates/DX_User_Guide_Template.md` and output to `doc/02_dx_user_guide/` to preview the developer experience (DX) via explicit JSON stubs and mock usage flows. **Executed as individual sub-tasks for each CUJ.** 
+3. `P3.3_GENERATE_UX_PROTOTYPE (P3B)`: If a visual UI is required, the UX Agent generates high-fidelity HTML/CSS mockups in the `UX_prototype/` folder. **Executed as individual sub-tasks for each CUJ.** A text version of expansion of CUJ in PRD should be put into `doc/02_ux_user_guide/0x_cuj_name.md` as well.
 4. `P3.4_START_MOCK_SERVER`: The UX Agent outputs a command (e.g., `npx http-server UX_prototype/`) for the human to preview the prototype.
 5. `P3.5_AGENT_PEER_REVIEW`: An independent QA reviews the prototypes against the Design System (Template Group) and CUJ coverage.
 6. `P3.6_HUMAN_REVIEW`: Present the validated models to the human user for evaluation.

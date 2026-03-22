@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap');
+
+:root {
+  --primary: #D4FF00;
+  --primary-light: #E9FF80;
+  --bg-main: #F5F7F8;
+  --surface-glass: rgba(255, 255, 255, 0.7);
+  --surface-solid: #FFFFFF;
+  --text-main: #1A1C1E;
+  --text-muted: #64748B;
+  --border: rgba(0, 0, 0, 0.08);
+  --accent-red: #EF4444;
+  --sidebar-width: 260px;
+  --radius: 12px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+.glass-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--text-main);
+}
+
+.btn-primary:hover {
+  filter: brightness(0.95);
+  transform: translateY(-1px);
+}
+
+@keyframes intense-glow {
+  0% { box-shadow: 0 0 5px #D4FF00, 0 0 10px #D4FF00; transform: scale(1); }
+  100% { box-shadow: 0 0 15px #D4FF00, 0 0 30px #D4FF00, 0 0 45px rgba(212, 255, 0, 0.5); transform: scale(1.03); }
+}
+
+.project-bubble-glow {
+  animation: intense-glow 2s infinite alternate ease-in-out;
+}

@@ -10,6 +10,13 @@ Limesoda's **Market Research (Phase 1)** agent is designed to be cynical. If you
 - **Bad Prompt:** "Build me a social media app." 
 - **Good Prompt:** "Build a B2B SaaS dashboard that allows HR managers to track employee churn using LinkedIn API data."
 
+### Include the “shape” of success
+If you want the pipeline to converge quickly, add a few hard constraints:
+- **Audience:** who it’s for and why they care.
+- **Core workflows:** 2–5 user journeys (“create X”, “review Y”, “export Z”).
+- **Non-functional constraints:** latency/security/compliance expectations if any.
+- **Integration constraints:** the external systems that must be used (or must be avoided).
+
 ## 3. What Happens Next?
 Once you hit **Submit**:
 1. The **Control Plane** invokes the **EM Agent (A6)**.

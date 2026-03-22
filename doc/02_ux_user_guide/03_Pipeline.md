@@ -4,7 +4,7 @@ Limesoda operates on a fixed, high-governance 10-Phase SDLC. Each phase is a "No
 
 | Phase | Name | Active Agent | Key Output |
 | :--- | :--- | :--- | :--- |
-| **P1** | Market Research | PM Agent | `Market_Feasibility.md` |
+| **P1** | Market Research | PM Agent | `Market_Feasibility_Report.md` |
 | **P2** | PRD | PM Agent | `PRD.md` |
 | **P3A** | Developer Exp (DX) | Designer | `DX_User_Guide.md` |
 | **P3B** | User Exp (UX) | Designer | `UX_prototype/` (Mock UI) |
@@ -22,6 +22,14 @@ While the 10-Phase Graph represents the high-level orchestration, each **Phase (
 
 For example, in **Phase 7 (Implementation)**, multiple Developer Agents may work on different issues (e.g., `Issue #42: Setup Auth`, `Issue #43: API CRUD`) simultaneously within the same codebase.
 
+## Pipeline Customization (Phase Toggles)
+Some projects do not require the full 10-phase rigor. In **Project Settings**, you can disable phases (e.g., disable Phase 8 for a prototype that will never be deployed).
+
+Operational behavior:
+- A **disabled phase** is treated as **skipped by policy** (not “failed”).
+- Downstream phases that depend on disabled outputs may be blocked unless you **manually fulfill** the missing artifact.
+- If you re-enable a phase mid-flight, the EM will inject the necessary issues back into the correct phase.
+
 ## Concurrent Phases & Feature Requests
 Limesoda's orchestration is non-linear. It is possible (and common) for **multiple phases to be in progress simultaneously**.
 
@@ -34,6 +42,9 @@ Limesoda's orchestration is non-linear. It is possible (and common) for **multip
 Each Phase ends with a **Gate**. A Gate consists of two **Reviewer Agents** (Micro/Sanity and Macro/Value) and one **Autonomous Judge**.
 - If the Judge scores the work < 9/10, the Agent is sent back to retry (Max 3 times).
 - After the Judge approves, the **Human Tech Lead** is notified for final sign-off.
+
+> [!TIP]
+> Approval is GitHub-native: you typically approve by reviewing/merging the PR for the phase’s artifact (PRD/RFC/LLD). See the exact rules in [GitHub Workflow](06_GitHub_Workflow.md).
 
 ---
 **Next Step:** [Monitoring your Agents in the Radar](04_Monitoring.md).
