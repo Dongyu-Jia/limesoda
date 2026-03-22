@@ -38,18 +38,19 @@ OUTPUT_DIR = REPO_ROOT / "doc" / "00_market_research"
 # Config — hardcoded for demo
 # ---------------------------------------------------------------------------
 ANTHROPIC_API_KEY = "YOUR_ANTHROPIC_API_KEY"
-TAVILY_API_KEY    = "YOUR_TAVILY_API_KEY"     # free tier at tavily.com
-GITHUB_TOKEN      = "YOUR_GITHUB_TOKEN"
-GITHUB_REPO       = "dongyujia/limesoda"
-HUMAN_TECH_LEAD   = "dongyujia"               # GitHub username to assign the PR to
-MAX_RETRIES       = 3
-MODEL             = "claude-sonnet-4-6"
+TAVILY_API_KEY = "YOUR_TAVILY_API_KEY"  # free tier at tavily.com
+GITHUB_TOKEN = "YOUR_GITHUB_TOKEN"
+GITHUB_REPO = "dongyujia/limesoda"
+HUMAN_TECH_LEAD = "dongyujia"  # GitHub username to assign the PR to
+MAX_RETRIES = 3
+MODEL = "claude-sonnet-4-6"
 
-llm         = ChatAnthropic(model=MODEL, api_key=ANTHROPIC_API_KEY, max_tokens=4096)
+llm = ChatAnthropic(model=MODEL, api_key=ANTHROPIC_API_KEY, max_tokens=4096)
 search_tool = TavilySearchResults(max_results=5, tavily_api_key=TAVILY_API_KEY)
 
 # LLM variant that knows about the search tool and can emit tool calls
 llm_with_tools = llm.bind_tools([search_tool])
+
 
 # ---------------------------------------------------------------------------
 # Load prompts and template from source files — no duplication
@@ -57,11 +58,13 @@ llm_with_tools = llm.bind_tools([search_tool])
 def _load(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
-PROMPT_GENERATOR        = _load(PROMPTS_DIR / "01_Generator.md")
-PROMPT_REVIEWER_DATA    = _load(PROMPTS_DIR / "02a_Reviewer_Data_Analyst.md")
+
+PROMPT_GENERATOR = _load(PROMPTS_DIR / "01_Generator.md")
+PROMPT_REVIEWER_DATA = _load(PROMPTS_DIR / "02a_Reviewer_Data_Analyst.md")
 PROMPT_REVIEWER_STRATEGY = _load(PROMPTS_DIR / "02b_Reviewer_Strategy.md")
-PROMPT_JUDGE            = _load(PROMPTS_DIR / "03_Judge.md")
-REPORT_TEMPLATE         = _load(TEMPLATES_DIR / "Market_Feasibility_Report_Template.md")
+PROMPT_JUDGE = _load(PROMPTS_DIR / "03_Judge.md")
+REPORT_TEMPLATE = _load(TEMPLATES_DIR / "Market_Feasibility_Report_Template.md")
+
 
 # ---------------------------------------------------------------------------
 # State
@@ -73,8 +76,9 @@ class P1State(TypedDict):
     reviewer_strategy_feedback: str
     judge_result: dict
     retry_count: int
-    final_status: str   # "pending_human" | "escalated"
+    final_status: str  # "pending_human" | "escalated"
     pr_url: str
+
 
 # ---------------------------------------------------------------------------
 # Nodes
@@ -126,10 +130,12 @@ def generator_node(state: P1State) -> P1State:
             query = tool_call["args"].get("query", "")
             print(f"  → [search] {query}")
             result = search_tool.invoke(tool_call["args"])
-            messages.append(ToolMessage(
-                content=json.dumps(result),
-                tool_call_id=tool_call["id"],
-            ))
+            messages.append(
+                ToolMessage(
+                    content=json.dumps(result),
+                    tool_call_id=tool_call["id"],
+                )
+            )
 
     return {
         **state,
@@ -141,10 +147,12 @@ def generator_node(state: P1State) -> P1State:
 def reviewer_data_node(state: P1State) -> P1State:
     print("[REVIEWER: Data Analyst] Auditing micro-level claims...")
 
-    response = llm.invoke([
-        {"role": "system", "content": PROMPT_REVIEWER_DATA},
-        {"role": "user",   "content": f"Review this report:\n\n{state['report']}"},
-    ])
+    response = llm.invoke(
+        [
+            {"role": "system", "content": PROMPT_REVIEWER_DATA},
+            {"role": "user", "content": f"Review this report:\n\n{state['report']}"},
+        ]
+    )
 
     print(f"  → {response.content[:120]}...")
     return {**state, "reviewer_data_feedback": response.content}
@@ -153,10 +161,12 @@ def reviewer_data_node(state: P1State) -> P1State:
 def reviewer_strategy_node(state: P1State) -> P1State:
     print("[REVIEWER: Strategy Expert] Auditing macro strategy...")
 
-    response = llm.invoke([
-        {"role": "system", "content": PROMPT_REVIEWER_STRATEGY},
-        {"role": "user",   "content": f"Review this report:\n\n{state['report']}"},
-    ])
+    response = llm.invoke(
+        [
+            {"role": "system", "content": PROMPT_REVIEWER_STRATEGY},
+            {"role": "user", "content": f"Review this report:\n\n{state['report']}"},
+        ]
+    )
 
     print(f"  → {response.content[:120]}...")
     return {**state, "reviewer_strategy_feedback": response.content}
@@ -171,20 +181,25 @@ def judge_node(state: P1State) -> P1State:
         f"Strategy Expert Review:\n{state['reviewer_strategy_feedback']}"
     )
 
-    response = llm.invoke([
-        {"role": "system", "content": PROMPT_JUDGE},
-        {"role": "user",   "content": context},
-    ])
+    response = llm.invoke(
+        [
+            {"role": "system", "content": PROMPT_JUDGE},
+            {"role": "user", "content": context},
+        ]
+    )
 
     raw = response.content.strip()
-    json_match = re.search(r'\{.*\}', raw, re.DOTALL)
+    json_match = re.search(r"\{.*\}", raw, re.DOTALL)
     try:
         result = json.loads(json_match.group()) if json_match else {}
     except json.JSONDecodeError:
         result = {}
 
     if "status" not in result:
-        result = {"status": "REJECTED", "remediation_plan": "Judge output was malformed. Rewrite with cleaner structure and stricter data citations."}
+        result = {
+            "status": "REJECTED",
+            "remediation_plan": "Judge output was malformed. Rewrite with cleaner structure and stricter data citations.",
+        }
 
     print(f"  → Judge: {result['status']}")
     return {**state, "judge_result": result}
@@ -203,7 +218,7 @@ def human_gate_node(state: P1State) -> P1State:
     """
     print("\n[HUMAN GATE] Delegating git + PR creation to Claude Code CLI...")
 
-    slug = re.sub(r'[^a-z0-9]+', '-', state['idea'].lower()).strip('-')[:50]
+    slug = re.sub(r"[^a-z0-9]+", "-", state["idea"].lower()).strip("-")[:50]
     report_filename = f"{slug}_Market_Feasibility_Report.md"
     branch_name = f"p1/market-research/{slug}"
 
@@ -250,7 +265,14 @@ Print only the PR URL on the last line of your response.
 
     # Extract PR URL from the last non-empty line of output
     output_lines = [l.strip() for l in result.stdout.strip().splitlines() if l.strip()]
-    pr_url = next((l for l in reversed(output_lines) if "github.com" in l and "/pull/" in l), "")
+    pr_url = next(
+        (
+            l
+            for l in reversed(output_lines)
+            if l.startswith("https://github.com/") and "/pull/" in l
+        ),
+        "",
+    )
 
     print(f"  → PR: {pr_url or '(url not found in output)'}")
     print("  → Merge this PR to approve Gate 1 and proceed to P2.")
@@ -280,26 +302,30 @@ def route_after_judge(state: P1State) -> str:
 def build_graph():
     g = StateGraph(P1State)
 
-    g.add_node("generator",          generator_node)
-    g.add_node("reviewer_data",      reviewer_data_node)
-    g.add_node("reviewer_strategy",  reviewer_strategy_node)
-    g.add_node("judge",              judge_node)
-    g.add_node("human_gate",         human_gate_node)
-    g.add_node("escalate",           escalate_node)
+    g.add_node("generator", generator_node)
+    g.add_node("reviewer_data", reviewer_data_node)
+    g.add_node("reviewer_strategy", reviewer_strategy_node)
+    g.add_node("judge", judge_node)
+    g.add_node("human_gate", human_gate_node)
+    g.add_node("escalate", escalate_node)
 
     g.set_entry_point("generator")
-    g.add_edge("generator",         "reviewer_data")
-    g.add_edge("reviewer_data",     "reviewer_strategy")
+    g.add_edge("generator", "reviewer_data")
+    g.add_edge("reviewer_data", "reviewer_strategy")
     g.add_edge("reviewer_strategy", "judge")
 
-    g.add_conditional_edges("judge", route_after_judge, {
-        "generator":  "generator",
-        "human_gate": "human_gate",
-        "escalate":   "escalate",
-    })
+    g.add_conditional_edges(
+        "judge",
+        route_after_judge,
+        {
+            "generator": "generator",
+            "human_gate": "human_gate",
+            "escalate": "escalate",
+        },
+    )
 
     g.add_edge("human_gate", END)
-    g.add_edge("escalate",   END)
+    g.add_edge("escalate", END)
 
     return g.compile()
 
