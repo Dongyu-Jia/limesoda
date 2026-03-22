@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package limesoda.schema.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// AgentType defines the supported AI coordination or generation engines.
+enum AgentType {
+  AGENT_TYPE_UNSPECIFIED = 0;
+  AGENT_TYPE_CLAUDE_CODE = 1;        // Anthropic Claude Code specialized for development
+  AGENT_TYPE_CODEX = 2;              // OpenAI Codex / GPT-4o based models
+}
+
+// Agent defines the identity and capabilities of an AI worker.
+message Agent {
+  string id = 1;                     // Unique identifier (UUID)
+  string name = 2;                   // Human-readable name (e.g. "A3-Business-Logic-Developer")
+  string description = 3;            // Description of the agent
+  repeated string instructions_md = 4; // Paths to markdown files with system prompts or SOPs
+  AgentType type = 5;                // The underlying AI engine/model type
+}
+
+// RuntimeTemplate defines the base environment for execution.
+message RuntimeTemplate {
+  string id = 1;                     // Unique identifier (UUID)
+  string name = 2;                   // Human-readable name (e.g. "NodeJS-Sandbox")
+  string dockerfile_path = 3;        // Path to the Dockerfile defining the runtime environment
+}
+
+// OutputStatus defines the possible outcomes of a Node execution.
+enum OutputStatus {
+  OUTPUT_STATUS_UNSPECIFIED = 0;
+  PASS = 1;
+  FAIL = 2;
+  ESCALATE_TO_HUMAN = 3;
+  ESCALATE_TO_HIGHER_LEVEL_AGENT = 4;
+}
+
+// Node is the minimum execution unit within a Process.
+message Node {
+  string id = 1;                     // id of the node, end node id is "end"
+
+  string name = 2;                   // Human-readable name
+  string description = 3;            // Description of the work unit
+  string input_instruction = 4;      // The prompt or task description
+  
+  // Execution context
+  Agent agent = 5;                   // The agent assigned to this work unit
+  string runtime_id = 6;             // Environment to run (runtime template ID)
+
+  // Results
+  OutputStatus output_status = 7;
+  string output_text = 8;
+  repeated string artifact_links = 11; // Links to generated artifacts (e.g. storage URIs, PR URLs etc)
+}
+
+// Edge defines a transition between two nodes based on the output status of the source node.
+message Edge {
+  string from_node_id = 1;           // Source node ID
+  string to_node_id = 2;             // Destination node ID
+  OutputStatus on_status = 3;        // Transition trigger status
+}
+
+// OverrideRule allows overriding a node's output status based on execution history (e.g., max retries).
+message OverrideRule {
+  string node_id = 1;                // Target node ID
+  int32 max_runs = 2;                // Maximum number of runs before override
+  OutputStatus override_status = 3;  // Status to apply when max_runs is reached
+}
+
+// Process defines a Directed Acyclic Graph (DAG) of Nodes and their transitions.
+message Process {
+  string id = 1;                     // Unique identifier (UUID)
+  string name = 2;                   // Human-readable name of the process
+  string entry_node_id = 3;          // Entry node ID
+  string exit_node_id = 4;           // Exit node ID
+  repeated Node nodes = 5;           // Set of nodes in the process
+  repeated Edge edges = 6;           // Set of transitions between nodes
+  repeated OverrideRule rules = 7;   // Execution rules (e.g. run limits)
+}
+
+// WorkflowStatus tracks the overall lifecycle of a Workflow execution.
+enum WorkflowStatus {
+  WORKFLOW_STATUS_UNSPECIFIED = 0;
+  WORKFLOW_STATUS_PENDING = 1;
+  WORKFLOW_STATUS_RUNNING = 2;
+  WORKFLOW_STATUS_COMPLETED = 3;
+  WORKFLOW_STATUS_FAILED = 4;
+}
+
+// Workflow is the top-level execution entity aggregating a Process, its environment, and status.
+message Workflow {
+  string id = 1;                     // Unique identifier (UUID)
+  string name = 2;                   // Human-readable name
+  Process process = 3;               // The DAG definition
+  RuntimeTemplate runtime_template = 4; // The base environment
+  
+  // Runtime status information
+  WorkflowStatus status = 5;
+  map<string, int32> node_run_counts = 6; // Counter for each node (key: node_id)
+  
+  google.protobuf.Timestamp started_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
