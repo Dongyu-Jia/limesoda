@@ -20,28 +20,33 @@ from pathlib import Path
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 REPO_ROOT = Path(__file__).parent.parent
-ENV_FILE  = REPO_ROOT / ".env"
+ENV_FILE = REPO_ROOT / ".env"
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
-BOLD  = "\033[1m"
+BOLD = "\033[1m"
 GREEN = "\033[32m"
-RED   = "\033[31m"
-CYAN  = "\033[36m"
-LIME  = "\033[38;2;195;255;0m"   # HSL(74, 100%, 50%) — Limesoda brand color
-DIM   = "\033[2m"
+RED = "\033[31m"
+CYAN = "\033[36m"
+LIME = "\033[38;2;195;255;0m"  # HSL(74, 100%, 50%) — Limesoda brand color
+DIM = "\033[2m"
 RESET = "\033[0m"
+
 
 def header(text):
     print(f"\n{BOLD}{CYAN}{text}{RESET}")
 
+
 def ok(text):
     print(f"  {GREEN}✓{RESET} {text}")
+
 
 def fail(text):
     print(f"  {RED}✗{RESET} {text}")
 
+
 def info(text):
     print(f"  {DIM}{text}{RESET}")
+
 
 def ask(prompt, secret=False, default=None):
     display = f"{BOLD}{prompt}{RESET}"
@@ -50,15 +55,19 @@ def ask(prompt, secret=False, default=None):
     display += " → "
     if secret:
         import getpass
+
         val = getpass.getpass(display)
     else:
         val = input(display).strip()
     return val or default or ""
 
+
 def check_command(cmd):
     return shutil.which(cmd) is not None
 
+
 # ── Validators ────────────────────────────────────────────────────────────────
+
 
 def validate_anthropic_key(key):
     """Call Anthropic models endpoint — returns (ok: bool, message: str)."""
@@ -83,7 +92,10 @@ def validate_github_token(token):
     """Call GitHub /user endpoint — returns (ok: bool, username: str | error)."""
     req = urllib.request.Request(
         "https://api.github.com/user",
-        headers={"Authorization": f"token {token}", "Accept": "application/vnd.github+json"},
+        headers={
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github+json",
+        },
     )
     try:
         with urllib.request.urlopen(req, timeout=8) as r:
@@ -107,7 +119,10 @@ def validate_github_repo(token, repo_url):
     owner_repo = parts[1].strip("/")
     req = urllib.request.Request(
         f"https://api.github.com/repos/{owner_repo}",
-        headers={"Authorization": f"token {token}", "Accept": "application/vnd.github+json"},
+        headers={
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github+json",
+        },
     )
     try:
         with urllib.request.urlopen(req, timeout=8) as r:
@@ -126,21 +141,23 @@ def validate_github_repo(token, repo_url):
 
 # ── Steps ─────────────────────────────────────────────────────────────────────
 
+
 def step_prerequisites():
     header("Step 1 — Prerequisites")
     all_ok = True
     for cmd, install_hint in [
-        ("docker",         "https://docs.docker.com/get-docker/"),
+        ("docker", "https://docs.docker.com/get-docker/"),
         ("docker compose", "included with Docker Desktop"),
-        ("git",            "https://git-scm.com/downloads"),
-        ("python3",        "https://python.org/downloads"),
+        ("git", "https://git-scm.com/downloads"),
+        ("python3", "https://python.org/downloads"),
     ]:
         # "docker compose" is a subcommand, not a binary
         if " " in cmd:
             parts = cmd.split()
-            found = check_command(parts[0]) and subprocess.run(
-                parts, capture_output=True
-            ).returncode == 0
+            found = (
+                check_command(parts[0])
+                and subprocess.run(parts, capture_output=True).returncode == 0
+            )
         else:
             found = check_command(cmd)
 
@@ -161,7 +178,9 @@ def step_anthropic(env):
     info("Get a key at: https://console.anthropic.com/settings/keys")
 
     while True:
-        key = ask("ANTHROPIC_API_KEY", secret=True, default=env.get("ANTHROPIC_API_KEY"))
+        key = ask(
+            "ANTHROPIC_API_KEY", secret=True, default=env.get("ANTHROPIC_API_KEY")
+        )
         if not key:
             fail("key cannot be empty")
             continue
@@ -223,7 +242,7 @@ def step_target_repo(env):
         if valid:
             ok(f"push access confirmed → {result}")
             env["GITHUB_REPO_URL"] = repo_url
-            env["GITHUB_REPO"] = result   # owner/repo format
+            env["GITHUB_REPO"] = result  # owner/repo format
             break
         else:
             fail(result)
@@ -293,6 +312,7 @@ def step_next_steps(env):
 
 # ── Load existing .env ────────────────────────────────────────────────────────
 
+
 def load_env():
     env = {}
     if ENV_FILE.exists():
@@ -305,6 +325,7 @@ def load_env():
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
+
 
 def main():
     print(f"""

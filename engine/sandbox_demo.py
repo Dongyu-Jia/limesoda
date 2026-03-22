@@ -28,11 +28,12 @@ from datetime import timedelta
 # ---------------------------------------------------------------------------
 # Config — hardcoded for demo
 # ---------------------------------------------------------------------------
-E2B_API_KEY       = "YOUR_E2B_API_KEY"
-E2B_TEMPLATE      = "limesoda-agent"      # deployed from e2b.Dockerfile
-TEMPORAL_HOST     = "localhost:7233"
+E2B_API_KEY = "YOUR_E2B_API_KEY"
+E2B_TEMPLATE = "limesoda-agent"  # deployed from e2b.Dockerfile
+TEMPORAL_HOST = "localhost:7233"
 ANTHROPIC_API_KEY = "YOUR_ANTHROPIC_API_KEY"
-GITHUB_TOKEN      = "YOUR_GITHUB_TOKEN"
+GITHUB_TOKEN = "YOUR_GITHUB_TOKEN"
+
 
 # ---------------------------------------------------------------------------
 # Shared types
@@ -40,15 +41,16 @@ GITHUB_TOKEN      = "YOUR_GITHUB_TOKEN"
 @dataclass
 class AgentTask:
     task_id: str
-    phase: str          # "P1", "P2", etc.
+    phase: str  # "P1", "P2", etc.
     prompt: str
     repo_url: str
 
+
 @dataclass
 class AgentResult:
-    status: str         # "completed" | "failed"
-    output_file: str    # path written inside sandbox, committed to git
-    summary: str        # short human-readable summary
+    status: str  # "completed" | "failed"
+    output_file: str  # path written inside sandbox, committed to git
+    summary: str  # short human-readable summary
 
 
 # ===========================================================================
@@ -61,6 +63,7 @@ class AgentResult:
 #   - Also prevents the activity from timing out during long runs
 #   - On worker restart, activity resumes from last heartbeat checkpoint
 # ===========================================================================
+
 
 @activity.defn
 async def run_agent_with_heartbeat(task: AgentTask) -> AgentResult:
@@ -81,18 +84,20 @@ async def run_agent_with_heartbeat(task: AgentTask) -> AgentResult:
             if line:
                 log_lines.append(line)
                 # Each heartbeat is visible in Temporal Web UI and pollable by dashboard
-                activity.heartbeat({
-                    "task_id": task.task_id,
-                    "phase":   task.phase,
-                    "last_log": line,
-                    "log_count": len(log_lines),
-                })
+                activity.heartbeat(
+                    {
+                        "task_id": task.task_id,
+                        "phase": task.phase,
+                        "last_log": line,
+                        "log_count": len(log_lines),
+                    }
+                )
 
         await sbx.commands.run(
             f"git clone {task.repo_url} /repo && cd /repo && "
             f"claude --dangerously-skip-permissions -p '{task.prompt}'",
             on_stdout=on_stdout,
-            on_stderr=on_stdout,   # treat stderr as progress too
+            on_stderr=on_stdout,  # treat stderr as progress too
             timeout=3500,
         )
 
@@ -116,6 +121,7 @@ async def run_agent_with_heartbeat(task: AgentTask) -> AgentResult:
 #   - Activity reads the file and returns it to Temporal as the activity result
 #   - Workflow receives this as the return value of execute_activity()
 # ===========================================================================
+
 
 @activity.defn
 async def run_agent_return_value(task: AgentTask) -> AgentResult:
@@ -167,6 +173,7 @@ with open("/repo/.limesoda/result.json", "w") as f:
 #   - Sandbox then waits for the workflow to signal back (via a file or env var)
 # ===========================================================================
 
+
 @activity.defn
 async def run_agent_with_signal(task: AgentTask) -> AgentResult:
     workflow_id = activity.info().workflow_id
@@ -175,9 +182,9 @@ async def run_agent_with_signal(task: AgentTask) -> AgentResult:
         template=E2B_TEMPLATE,
         envs={
             "ANTHROPIC_API_KEY": ANTHROPIC_API_KEY,
-            "GH_TOKEN":          GITHUB_TOKEN,
-            "TEMPORAL_HOST":     TEMPORAL_HOST,
-            "WORKFLOW_ID":       workflow_id,        # sandbox knows who to signal
+            "GH_TOKEN": GITHUB_TOKEN,
+            "TEMPORAL_HOST": TEMPORAL_HOST,
+            "WORKFLOW_ID": workflow_id,  # sandbox knows who to signal
         },
         timeout=3600,
     ) as sbx:
@@ -204,6 +211,7 @@ async def run_agent_with_signal(task: AgentTask) -> AgentResult:
 # ---------------------------------------------------------------------------
 # Temporal Workflow — wires all three patterns together
 # ---------------------------------------------------------------------------
+
 
 @workflow.defn
 class LimesodaWorkflow:
@@ -247,6 +255,7 @@ class LimesodaWorkflow:
 # ---------------------------------------------------------------------------
 # Worker — max 10 sandboxes concurrently
 # ---------------------------------------------------------------------------
+
 
 async def run_worker():
     client = await Client.connect(TEMPORAL_HOST)
