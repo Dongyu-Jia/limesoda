@@ -266,7 +266,12 @@ Print only the PR URL on the last line of your response.
     # Extract PR URL from the last non-empty line of output
     output_lines = [l.strip() for l in result.stdout.strip().splitlines() if l.strip()]
     pr_url = next(
-        (l for l in reversed(output_lines) if "github.com" in l and "/pull/" in l), ""
+        (
+            l
+            for l in reversed(output_lines)
+            if l.startswith("https://github.com/") and "/pull/" in l
+        ),
+        "",
     )
 
     print(f"  → PR: {pr_url or '(url not found in output)'}")
