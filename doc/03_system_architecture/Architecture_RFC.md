@@ -447,7 +447,7 @@ These LLDs must be drafted in P6 (Component Design) before P7 (Implementation) b
 
 - [ ] **Auth Module**: JWT issuance, refresh, GitHub OAuth flow, RBAC middleware. Mandate: use existing library (e.g., `python-jose` + FastAPI security utilities). Do NOT hand-roll JWT signing.
 - [ ] **Temporal Workflow: LimesodaWorkflow**: Full state machine definition — all signals, activities, retry policies, human gate `wait_condition` logic, escalation path.
-- [ ] **LangGraph Agent Graph (per phase)**: Per-phase LangGraph definition. Start with P1. Each phase = its own compiled graph with Generator→Reviewer(s)→Judge nodes and retry routing.
+- [ ] **LangGraph Agent Graph (Manager -> Coding)**: Sequential graph for M2. Manager triages Issue, labels, and dispatches to Coding agent. Coding agent executes E2B sandbox. Start with Phase 1 (Research) or Phase 7 (Implementation) triage.
 - [ ] **E2B Sandbox Lifecycle Manager**: Activity function that creates, monitors (heartbeat), and destroys E2B sandboxes. Handles crash recovery, duplicate prevention, result file protocol.
 - [ ] **WebSocket State Bus**: FastAPI WebSocket endpoint + Redis PubSub subscriber. Connection management, authentication, fan-out logic.
 - [ ] **GitHub Webhook Handler**: HMAC verification, event routing, Temporal signal dispatch, idempotency.
@@ -455,6 +455,7 @@ These LLDs must be drafted in P6 (Component Design) before P7 (Implementation) b
 - [ ] **Multi-Tenant RLS Layer**: PostgreSQL RLS policies + FastAPI middleware that sets `app.current_org_id` and `app.current_project_id` per request. Integration tests that assert cross-tenant and cross-project data is unreachable.
 - [ ] **Cluster Health Aggregator**: Polls Temporal SDK, E2B API, PostgreSQL `pg_stat_activity`, Redis `INFO`, and GitHub rate limit endpoint. Caches with 10s TTL in Redis.
 - [ ] **Temporal Visibility Mapping**: Define Search Attributes (e.g., `OrgId`, `ProjectId`, `TaskStatus`) and map them to the Control Plane Dashboard's filtering requirements.
+- [ ] **CI/CD Foundation**: GitHub Actions for Unit Tests (API & Web). Required for M1.
 - [ ] **Unified Log Sink Configuration**: Set up structured JSON log routing to STDOUT for both API and Worker. Cloud deployment must include GCP Log Router Config for BigQuery syncing.
 - [ ] **Database Chart & Migration Plan (Simplified)**: ERD showing only relational entities (Orgs, Projects, Team, Secrets).
 

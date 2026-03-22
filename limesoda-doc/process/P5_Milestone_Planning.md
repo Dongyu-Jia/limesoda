@@ -1,8 +1,8 @@
 # Process: P5 - Milestone Planning
 - **Unique ID**: `P5_MILESTONE_PLANNING`
 - **Goal**: Sequence the monolithic Architecture Component Checklist into logical, chronological Milestones to ensure foundational dependencies (e.g., DB Auth) are built before downstream features (e.g., UI Dashboard).
-- **Input**: Approved `P4_ARCHITECTURE` RFC containing the Component Sub-Design Checklist.
-- **Output**: A prioritized `Milestone_Plan.md` mapping each component from P4 into distinct Milestones (M1, M2, M3).
+- **Input**: Approved `doc/03_system_architecture/Architecture_RFC.md`.
+- **Output**: A prioritized `doc/04_milestone_plan/Milestone_Plan.md` mapping each component into distinct Milestones (M1, M2, M3).
 - **Criteria**: Human User explicitly approves the Milestone scoping and timeline (Gate 5).
 
 ## Small Processes:
