@@ -1,22 +1,7 @@
-"""
-Proto-Driven LangGraph Compiler
-================================
-Reads a Process definition in textpb format and compiles it into a
-LangGraph StateGraph, then optionally renders a diagram PNG.
-
-Uses native ``google.protobuf.text_format`` to parse textpb against
-the compiled ``workflow_pb2`` bindings — no custom parser needed.
-
-Usage:
-    python -m engine.nodes.compiler <path/to/process.textpb> [--no-png]
-
-The textpb must define a ``Process`` message per workflow.proto.
-"""
-
 import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any, Protocol, TypedDict, runtime_checkable
 
 from google.protobuf import text_format
 from langgraph.graph import END, StateGraph
@@ -27,28 +12,90 @@ from langgraph.graph import END, StateGraph
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "schema" / "proto"))
 import workflow_pb2  # noqa: E402
 
-# ── OutputStatus enum name lookup ─────────────────────────────────────────
+# ── OutputStatus lookup ──────────────────────────────────────────────────
 
 _STATUS_ENUM = workflow_pb2.OutputStatus.DESCRIPTOR
 _STATUS_NAME_BY_VALUE = {v.number: v.name for v in _STATUS_ENUM.values}
 _UNSPECIFIED = workflow_pb2.OUTPUT_STATUS_UNSPECIFIED
 
 
-# ── Parse textpb → proto message ─────────────────────────────────────────
+# ── Dependency Injection Protocols ────────────────────────────────────────
 
-def parse_textpb(text: str) -> workflow_pb2.Process:
-    """Parse a textpb string into a native protobuf Process message."""
-    process = workflow_pb2.Process()
-    text_format.Parse(text, process)
-    return process
-
-
-def parse_textpb_file(path: Path) -> workflow_pb2.Process:
-    """Parse a textpb file into a native protobuf Process message."""
-    return parse_textpb(path.read_text(encoding="utf-8"))
+@runtime_checkable
+class WorkflowParser(Protocol):
+    """Interface for parsing process definitions."""
+    def parse(self, text: str) -> workflow_pb2.Process: ...
+    def parse_file(self, path: Path) -> workflow_pb2.Process: ...
 
 
-# ── LangGraph compiler ───────────────────────────────────────────────────
+@runtime_checkable
+class NodeFactory(Protocol):
+    """Interface for creating executable node functions."""
+    def create_node(self, node: workflow_pb2.Node) -> Any: ...
+
+
+@runtime_checkable
+class GraphBuilder(Protocol):
+    """Interface for building and compiling the workflow graph."""
+    def add_node(self, node_id: str, node_func: Any) -> None: ...
+    def set_entry_point(self, node_id: str) -> None: ...
+    def add_edge(self, start_node: str, end_node: str) -> None: ...
+    def add_conditional_edges(self, source_id: str, router_func: Any, status_map: dict[str, str]) -> None: ...
+    def compile(self) -> Any: ...
+
+
+# ── Concrete Implementations (Defaults) ───────────────────────────────────
+
+class ProtobufParser:
+    """Default parser using native google.protobuf.text_format."""
+    def parse(self, text: str) -> workflow_pb2.Process:
+        process = workflow_pb2.Process()
+        text_format.Parse(text, process)
+        return process
+
+    def parse_file(self, path: Path) -> workflow_pb2.Process:
+        return self.parse(path.read_text(encoding="utf-8"))
+
+
+class DefaultNodeFactory:
+    """Creates stub node functions for visualization/testing."""
+    def create_node(self, node: workflow_pb2.Node) -> Any:
+        node_id = node.id
+        node_name = node.name or node.id
+        node_desc = node.description or "executing..."
+
+        def _stub(state: dict) -> dict:
+            print(f"  [{node_name}] {node_desc}")
+            return {**state, "current_node": node_id}
+
+        _stub.__name__ = node_id
+        return _stub
+
+
+class LangGraphBuilder:
+    """Wraps LangGraph StateGraph implementation."""
+    def __init__(self, state_schema: type):
+        self._g = StateGraph(state_schema)
+
+    def add_node(self, node_id: str, node_func: Any) -> None:
+        if node_id != "end":
+            self._g.add_node(node_id, node_func)
+
+    def set_entry_point(self, node_id: str) -> None:
+        self._g.set_entry_point(node_id)
+
+    def add_edge(self, start_node: str, end_node: str) -> None:
+        target = END if end_node == "end" else end_node
+        self._g.add_edge(start_node, target)
+
+    def add_conditional_edges(self, source_id: str, router_func: Any, status_map: dict[str, str]) -> None:
+        self._g.add_conditional_edges(source_id, router_func, status_map)
+
+    def compile(self) -> Any:
+        return self._g.compile()
+
+
+# ── Core Compiler (The Orchestrator) ─────────────────────────────────────
 
 class ProcessState(TypedDict):
     """Minimal state carried through the compiled graph."""
@@ -57,110 +104,97 @@ class ProcessState(TypedDict):
     data: dict
 
 
-def _make_stub_node(node: workflow_pb2.Node):
-    """Create a stub node function for a given proto Node."""
-    node_id = node.id
-    node_name = node.name or node.id
-    node_desc = node.description or "executing..."
-
-    def _stub(state: ProcessState) -> ProcessState:
-        print(f"  [{node_name}] {node_desc}")
-        return {**state, "current_node": node_id}
-
-    _stub.__name__ = node_id
-    _stub.__qualname__ = node_id
-    return _stub
-
-
-def compile_process(process: workflow_pb2.Process) -> Any:
+class LangGraphCompiler:
     """
-    Compile a Process proto into a LangGraph StateGraph.
-
-    Returns the compiled graph (ready for .invoke() or .get_graph()).
+    Compiles a Process definition into a runnable graph.
+    Uses Dependency Injection for all core behaviors.
     """
-    g = StateGraph(ProcessState)
+    def __init__(
+        self,
+        parser: WorkflowParser | None = None,
+        node_factory: NodeFactory | None = None,
+        builder_factory: Any | None = None
+    ):
+        self.parser = parser or ProtobufParser()
+        self.node_factory = node_factory or DefaultNodeFactory()
+        self.builder_factory = builder_factory or (lambda: LangGraphBuilder(ProcessState))
 
-    # Add nodes (skip explicit "end" — LangGraph has built-in END)
-    for node in process.nodes:
-        if node.id == "end":
-            continue
-        g.add_node(node.id, _make_stub_node(node))
+    def compile(self, textpb: str) -> Any:
+        """Parse text and compile into a graph."""
+        process = self.parser.parse(textpb)
+        return self.compile_proto(process)
 
-    # Set entry point
-    if process.entry_node_id:
-        g.set_entry_point(process.entry_node_id)
+    def compile_proto(self, process: workflow_pb2.Process) -> Any:
+        """Compile a native Process proto into a graph."""
+        builder = self.builder_factory()
 
-    # Group edges by from_node_id
-    edges_by_source: dict[str, list[workflow_pb2.Edge]] = defaultdict(list)
-    for edge in process.edges:
-        edges_by_source[edge.from_node_id].append(edge)
+        # 1. Add nodes
+        for node in process.nodes:
+            if node.id == "end":
+                continue
+            builder.add_node(node.id, self.node_factory.create_node(node))
 
-    for source_id, edge_list in edges_by_source.items():
-        if source_id == "end":
-            continue
+        # 2. Set entry point
+        if process.entry_node_id:
+            builder.set_entry_point(process.entry_node_id)
 
-        unconditional = [e for e in edge_list if e.on_status == _UNSPECIFIED]
-        conditional = [e for e in edge_list if e.on_status != _UNSPECIFIED]
+        # 3. Add edges (grouped by source)
+        edges_by_source: dict[str, list[workflow_pb2.Edge]] = defaultdict(list)
+        for edge in process.edges:
+            edges_by_source[edge.from_node_id].append(edge)
 
-        if unconditional and not conditional:
-            # Simple linear edges
-            for edge in unconditional:
-                target = END if edge.to_node_id == "end" else edge.to_node_id
-                g.add_edge(source_id, target)
-        elif conditional:
-            # Build conditional edge map: status_name -> target_node
-            status_map: dict[str, str] = {}
-            for edge in conditional:
-                status_name = _STATUS_NAME_BY_VALUE.get(edge.on_status, str(edge.on_status))
-                target = END if edge.to_node_id == "end" else edge.to_node_id
-                status_map[status_name] = target
+        for source_id, edge_list in edges_by_source.items():
+            if source_id == "end":
+                continue
 
-            # Unconditional edges become default fallback
-            for edge in unconditional:
-                target = END if edge.to_node_id == "end" else edge.to_node_id
-                status_map["__default__"] = target
+            unconditional = [e for e in edge_list if e.on_status == _UNSPECIFIED]
+            conditional = [e for e in edge_list if e.on_status != _UNSPECIFIED]
 
-            # Create router function
-            def _make_router(smap: dict[str, str]):
-                def _router(state: ProcessState) -> str:
-                    status = state.get("output_status", "OUTPUT_STATUS_UNSPECIFIED")
-                    if status in smap:
-                        return smap[status]
-                    if "__default__" in smap:
-                        return smap["__default__"]
-                    return next(iter(smap.values()))
-                return _router
+            if unconditional and not conditional:
+                for edge in unconditional:
+                    builder.add_edge(source_id, edge.to_node_id)
+            elif conditional:
+                status_map: dict[str, str] = {}
+                for edge in conditional:
+                    status_name = _STATUS_NAME_BY_VALUE.get(edge.on_status, str(edge.on_status))
+                    target = END if edge.to_node_id == "end" else edge.to_node_id
+                    status_map[status_name] = target
 
-            g.add_conditional_edges(source_id, _make_router(status_map), status_map)
+                for edge in unconditional:
+                    target = END if edge.to_node_id == "end" else edge.to_node_id
+                    status_map["__default__"] = target
 
-    return g.compile()
+                builder.add_conditional_edges(source_id, self._make_router(status_map), status_map)
+
+        return builder.compile()
+
+    def _make_router(self, smap: dict[str, str]):
+        """Create a router function for conditional edges."""
+        def _router(state: ProcessState) -> str:
+            status = state.get("output_status", "OUTPUT_STATUS_UNSPECIFIED")
+            if status in smap:
+                return smap[status]
+            if "__default__" in smap:
+                return smap["__default__"]
+            return next(iter(smap.values()))
+        return _router
 
 
-# ── Diagram rendering ─────────────────────────────────────────────────────
+# ── Utilities ────────────────────────────────────────────────────────────
 
-def render_diagram(process: workflow_pb2.Process, output_path: Path | None = None) -> Path:
-    """
-    Compile the process and render its graph as a PNG diagram.
-
-    Returns the path to the generated PNG file.
-    """
-    graph = compile_process(process)
-
-    if output_path is None:
-        output_path = Path("graph.png")
-
+def render_diagram(graph: Any, output_path: Path) -> Path:
+    """Helper to render a compiled graph to PNG."""
     png_bytes = graph.get_graph().draw_mermaid_png()
     output_path.write_bytes(png_bytes)
     print(f"Diagram saved: {output_path}")
     return output_path
 
 
-# ── CLI entry point ───────────────────────────────────────────────────────
+# ── CLI Entry Point ──────────────────────────────────────────────────────
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python -m engine.nodes.compiler <process.textpb> [--no-png]")
-        print("       python engine/nodes/compiler.py <process.textpb> [--no-png]")
+        print("Usage: python engine/nodes/compiler.py <process.textpb> [--no-png]")
         sys.exit(1)
 
     textpb_path = Path(sys.argv[1])
@@ -168,26 +202,20 @@ def main():
         print(f"Error: {textpb_path} not found")
         sys.exit(1)
 
-    process = parse_textpb_file(textpb_path)
+    # Bootstrap with default implementations (Injection point)
+    compiler = LangGraphCompiler()
+    process = compiler.parser.parse_file(textpb_path)
 
     print(f"Process: {process.name}")
-    print(f"  Nodes: {[n.id for n in process.nodes]}")
-    print(f"  Edges: {[(e.from_node_id, e.to_node_id, _STATUS_NAME_BY_VALUE.get(e.on_status)) for e in process.edges]}")
-    print(f"  Rules: {[(r.node_id, r.max_runs, _STATUS_NAME_BY_VALUE.get(r.override_status)) for r in process.rules]}")
+    graph = compiler.compile_proto(process)
 
-    graph = compile_process(process)
-
-    # Print ASCII + Mermaid
+    # Visual verify
     print("\n--- Graph (ASCII) ---")
     print(graph.get_graph().draw_ascii())
-    print("\n--- Mermaid source ---")
-    print(graph.get_graph().draw_mermaid())
 
-    # Render PNG unless explicitly disabled
     if "--no-png" not in sys.argv:
-        png_path = textpb_path.parent / textpb_path.stem
-        png_path = png_path.with_suffix(".png")
-        render_diagram(process, png_path)
+        png_path = textpb_path.with_suffix(".png")
+        render_diagram(graph, png_path)
 
 
 if __name__ == "__main__":

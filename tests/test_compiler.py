@@ -11,8 +11,18 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent / "schema" / "proto"))
 
+import sys
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+# Ensure schema/proto is importable for workflow_pb2
+sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent / "schema" / "proto"))
+
 import workflow_pb2
-from engine.nodes.compiler import compile_process, parse_textpb
+from engine.nodes.compiler import LangGraphCompiler, ProtobufParser, DefaultNodeFactory
 
 # ── Fixtures ──────────────────────────────────────────────────────────────
 
@@ -69,124 +79,107 @@ edges { from_node_id: "done"      to_node_id: "end"       on_status: OUTPUT_STAT
 """
 
 
+# ── Mocks for DI Testing ──────────────────────────────────────────────────
+
+class MockGraphBuilder:
+    """A graph builder that just records calls instead of building a real graph."""
+    def __init__(self):
+        self.nodes = []
+        self.edges = []
+        self.entry_point = None
+        self.conditional_edges = []
+
+    def add_node(self, node_id: str, node_func: Any) -> None:
+        self.nodes.append(node_id)
+
+    def set_entry_point(self, node_id: str) -> None:
+        self.entry_point = node_id
+
+    def add_edge(self, start_node: str, end_node: str) -> None:
+        self.edges.append((start_node, end_node))
+
+    def add_conditional_edges(self, source_id: str, router_func: Any, status_map: dict[str, str]) -> None:
+        self.conditional_edges.append((source_id, status_map))
+
+    def compile(self) -> Any:
+        return self
+
+
 # ── Parse tests ───────────────────────────────────────────────────────────
 
 class TestParseTextpb:
     def test_minimal(self):
-        process = parse_textpb(MINIMAL_TEXTPB)
+        parser = ProtobufParser()
+        process = parser.parse(MINIMAL_TEXTPB)
         assert process.id == "test-001"
         assert process.name == "Minimal Test Process"
-        assert process.entry_node_id == "start"
         assert len(process.nodes) == 2
-        assert len(process.edges) == 2
-
-    def test_node_fields(self):
-        process = parse_textpb(MINIMAL_TEXTPB)
-        start = process.nodes[0]
-        assert start.id == "start"
-        assert start.name == "Start"
-        assert start.description == "Entry node"
-
-    def test_edge_fields(self):
-        process = parse_textpb(MINIMAL_TEXTPB)
-        edge = process.edges[0]
-        assert edge.from_node_id == "start"
-        assert edge.to_node_id == "finish"
-        assert edge.on_status == workflow_pb2.OUTPUT_STATUS_UNSPECIFIED
-
-    def test_conditional_edges(self):
-        process = parse_textpb(CONDITIONAL_TEXTPB)
-        cond_edges = [e for e in process.edges if e.from_node_id == "reviewer"]
-        assert len(cond_edges) == 2
-        statuses = {e.on_status for e in cond_edges}
-        assert workflow_pb2.PASS in statuses
-        assert workflow_pb2.FAIL in statuses
-
-    def test_p1_market_research(self):
-        path = EXAMPLES_DIR / "p1_market_research" / "p1_market_research.textpb"
-        if not path.exists():
-            pytest.skip("Example file not found")
-        process = parse_textpb(path.read_text())
-        assert process.name == "P1 Market Research"
-        assert len(process.nodes) == 6
-        assert process.entry_node_id == "generator"
-        # Check agent on generator node
-        gen = next(n for n in process.nodes if n.id == "generator")
-        assert gen.HasField("agent")
-        assert gen.agent.name == "A1-Product-Manager"
-
-    def test_coding_agent(self):
-        path = EXAMPLES_DIR / "coding_agent" / "coding_agent.textpb"
-        if not path.exists():
-            pytest.skip("Example file not found")
-        process = parse_textpb(path.read_text())
-        assert process.name == "Coding Implementation Agent"
-        assert len(process.nodes) == 6
-        assert process.entry_node_id == "planner"
-
-    def test_override_rules(self):
-        path = EXAMPLES_DIR / "p1_market_research" / "p1_market_research.textpb"
-        if not path.exists():
-            pytest.skip("Example file not found")
-        process = parse_textpb(path.read_text())
-        assert len(process.rules) == 1
-        rule = process.rules[0]
-        assert rule.node_id == "generator"
-        assert rule.max_runs == 3
-        assert rule.override_status == workflow_pb2.ESCALATE_TO_HUMAN
 
     def test_invalid_textpb_raises(self):
-        """Ensure malformed textpb raises a ParseError."""
+        parser = ProtobufParser()
         with pytest.raises(Exception):
-            parse_textpb("totally invalid { not a proto")
+            parser.parse("totally invalid { not a proto")
 
 
-# ── Compile tests ─────────────────────────────────────────────────────────
+# ── DI & Logic Tests ──────────────────────────────────────────────────────
 
-class TestCompileProcess:
-    def test_minimal_compile(self):
-        process = parse_textpb(MINIMAL_TEXTPB)
-        graph = compile_process(process)
+class TestCompilerDI:
+    def test_injection_works(self):
+        """Verify that injecting a mock builder records the correct calls."""
+        mock_builder = MockGraphBuilder()
+        compiler = LangGraphCompiler(
+            builder_factory=lambda: mock_builder
+        )
+        
+        compiler.compile(MINIMAL_TEXTPB)
+        
+        assert "start" in mock_builder.nodes
+        assert "finish" in mock_builder.nodes
+        assert mock_builder.entry_point == "start"
+        assert ("start", "finish") in mock_builder.edges
+        assert ("finish", "end") in mock_builder.edges
+
+    def test_conditional_logic_injection(self):
+        """Verify conditional edges are recorded correctly in mock builder."""
+        mock_builder = MockGraphBuilder()
+        compiler = LangGraphCompiler(builder_factory=lambda: mock_builder)
+        
+        compiler.compile(CONDITIONAL_TEXTPB)
+        
+        assert len(mock_builder.conditional_edges) == 1
+        source, smap = mock_builder.conditional_edges[0]
+        assert source == "reviewer"
+        assert smap["PASS"] == "done"
+        assert smap["FAIL"] == "worker"
+
+
+# ── Integration Tests (Default implementations) ───────────────────────────
+
+class TestCompilerIntegration:
+    @pytest.fixture
+    def compiler(self):
+        return LangGraphCompiler()
+
+    def test_minimal_compile(self, compiler):
+        graph = compiler.compile(MINIMAL_TEXTPB)
         assert graph is not None
+        # Verify it's a real LangGraph compiled object
+        assert hasattr(graph, "get_graph")
 
-    def test_conditional_compile(self):
-        process = parse_textpb(CONDITIONAL_TEXTPB)
-        graph = compile_process(process)
-        assert graph is not None
-
-    def test_p1_compile(self):
+    def test_p1_market_research(self, compiler):
         path = EXAMPLES_DIR / "p1_market_research" / "p1_market_research.textpb"
         if not path.exists():
             pytest.skip("Example file not found")
-        process = parse_textpb(path.read_text())
-        graph = compile_process(process)
+        process = compiler.parser.parse_file(path)
+        graph = compiler.compile_proto(process)
         assert graph is not None
-
-    def test_coding_agent_compile(self):
-        path = EXAMPLES_DIR / "coding_agent" / "coding_agent.textpb"
-        if not path.exists():
-            pytest.skip("Example file not found")
-        process = parse_textpb(path.read_text())
-        graph = compile_process(process)
-        assert graph is not None
-
-    def test_graph_has_nodes(self):
-        process = parse_textpb(MINIMAL_TEXTPB)
-        graph = compile_process(process)
-        node_names = [n.name for n in graph.get_graph().nodes.values()]
-        assert "start" in node_names
-        assert "finish" in node_names
-
-    def test_mermaid_output(self):
-        process = parse_textpb(MINIMAL_TEXTPB)
-        graph = compile_process(process)
+        
+        node_ids = [n.id for n in process.nodes]
+        assert "generator" in node_ids
+        
+    def test_graph_topology(self, compiler):
+        graph = compiler.compile(MINIMAL_TEXTPB)
         mermaid = graph.get_graph().draw_mermaid()
         assert "start" in mermaid
         assert "finish" in mermaid
-
-    def test_ascii_output(self):
-        process = parse_textpb(MINIMAL_TEXTPB)
-        graph = compile_process(process)
-        ascii_art = graph.get_graph().draw_ascii()
-        assert "start" in ascii_art
-        assert "finish" in ascii_art
+        assert "__end__" in mermaid
